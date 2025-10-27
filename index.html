@@ -628,10 +628,10 @@
             showLoading(true);
 
             try {
-                // PERUBAHAN: Data disimpan berdasarkan userId
+                // PERBAIKAN: Tambahkan fallback untuk displayName dan email
                 const submissionData = {
-                    googleName: auth.currentUser.displayName,
-                    googleEmail: auth.currentUser.email,
+                    googleName: auth.currentUser.displayName || 'Pengguna Tanpa Nama',
+                    googleEmail: auth.currentUser.email || 'email-tidak-diketahui',
                     statements: statements,
                     submittedAt: new Date()
                 };
@@ -645,6 +645,9 @@
                 document.querySelectorAll('#step2 textarea').forEach(ta => ta.disabled = true);
                 
                 unlockQuizSection();
+                
+                // PERBAIKAN BARU: Scroll ke Langkah 2 (Monitoring) untuk feedback visual
+                document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
                 console.error("Error submitting statements: ", error);
@@ -1019,5 +1022,6 @@
     </script>
 </body>
 </html>
+
 
 
