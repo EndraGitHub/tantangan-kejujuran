@@ -49,83 +49,27 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen">
 
-    <!-- Modal Manajemen Data Pegawai (CRUD) -->
-    <div id="employeeListModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-        <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-300 scale-95 opacity-0">
-            <!-- Modal Header -->
-            <div class="p-6 border-b flex justify-between items-center bg-indigo-50">
-                <h3 class="text-2xl font-bold text-indigo-800">Manajemen Data Pegawai (CRUD)</h3>
-                <button id="closeModalButton" onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <!-- Modal Content -->
-            <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                
-                <!-- Form Tambah/Edit Pegawai -->
-                <div class="p-4 border-2 border-dashed border-indigo-300 rounded-lg bg-white shadow-sm">
-                    <h4 id="formTitle" class="text-lg font-semibold text-gray-800 mb-4">Tambah Pegawai Baru</h4>
-                    <form id="employeeForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="hidden" id="employeeDocId">
-                        
-                        <div>
-                            <label for="inputName" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                            <input type="text" id="inputName" required placeholder="Cth: Albert Hutagaol"
-                                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                        
-                        <div>
-                            <label for="inputId" class="block text-sm font-medium text-gray-700">ID Pegawai</label>
-                            <input type="text" id="inputId" required placeholder="Cth: P_022"
-                                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 uppercase">
-                        </div>
-                        
-                        <div>
-                            <label for="inputUsername" class="block text-sm font-medium text-gray-700">Username</label>
-                            <input type="text" id="inputUsername" required placeholder="Cth: albertparasian"
-                                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 lowercase">
-                        </div>
-                        
-                        <div class="flex items-end space-x-2">
-                            <button type="submit" id="saveEmployeeButton"
-                                class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">
-                                Simpan
-                            </button>
-                            <button type="button" id="cancelEditButton" onclick="resetForm()"
-                                class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition hidden">
-                                Batal
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Table Daftar Pegawai -->
-                <table class="min-w-full divide-y divide-gray-200 mt-4 border border-gray-100 rounded-lg overflow-hidden shadow">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pegawai</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pegawai</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employeeListTableBody" class="bg-white divide-y divide-gray-200">
-                        <tr><td colspan="5" class="text-center py-4 text-gray-500">Memuat data pegawai...</td></tr>
-                        <!-- Employee list injected here -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Modal Footer -->
-            <div class="p-4 border-t bg-gray-50 flex justify-end">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
-                    Tutup
-                </button>
-            </div>
+    <!-- Layar Login Overlay -->
+    <div id="loginOverlay" class="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-2xl border text-center">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Selamat Datang</h2>
+            <p class="text-gray-600 mb-8">Aplikasi ini memerlukan autentikasi. Silakan login menggunakan akun Google Anda untuk melanjutkan.</p>
+            <button id="googleLoginButton"
+                class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150">
+                <!-- SVG Ikon Google -->
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                Login dengan Google
+            </button>
+            <p id="loginStatus" class="mt-4 text-sm text-gray-500 hidden">Menghubungkan ke Google...</p>
         </div>
     </div>
+
+    <!-- DIHAPUS: Modal Manajemen Data Pegawai (CRUD) tidak lagi diperlukan -->
     
     <!-- Loading Indicator UI -->
     <div id="loadingIndicator" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
@@ -155,47 +99,30 @@
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
+    <!-- Konten Aplikasi Utama (awalnya disembunyikan) -->
+    <div id="mainAppContainer" class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100 hidden">
 
         <header class="mb-8 border-b pb-4">
-            <h1 class="text-3xl font-extrabold text-gray-900">Aplikasi Tantangan Kejujuran : 3 Benar 1 Salah</h1>
-            <p class="mt-2 text-gray-600">Modul untuk menginput set empat (4) pernyataan diri: tiga (3) Benar dan satu (1) Salah, sebagai bagian dari Self-Assessment Kebenaran Diri. </p>
-        </header>
-
-        <!-- Langkah 1: Validasi Pegawai (Diubah ke Input Username) -->
-        <section id="step1" class="mb-10 p-6 bg-indigo-50 rounded-lg border-l-4 border-indigo-600">
-            <h2 class="text-xl font-bold text-indigo-800 mb-4">Langkah 1: Validasi Pegawai (Akses Terbatas)</h2>
-            <p class="text-sm text-gray-700 mb-4">Masukkan **Username** Anda yang terdaftar di sistem untuk memvalidasi identitas.</p>
-
-            <div class="flex flex-col sm:flex-row gap-3 relative">
-                <div class="flex-1 relative">
-                    <label for="usernameInput" class="sr-only">Username Pegawai</label>
-                    <input type="text" id="usernameInput" placeholder="Ketikkan username Anda (cth: albertparasian)"
-                        class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 lowercase"
-                        autocomplete="off">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-gray-900">Aplikasi Tantangan Kejujuran : 3 Benar 1 Salah</h1>
+                    <p class="mt-2 text-gray-600">Modul untuk menginput set empat (4) pernyataan diri: tiga (3) Benar dan satu (1) Salah, sebagai bagian dari Self-Assessment Kebenaran Diri. </p>
+                    <!-- Info user & tombol logout -->
+                    <p id="welcomeMessage" class="mt-2 text-sm text-gray-500"></p>
                 </div>
-                
-                <button id="validateUsernameButton" 
-                    class="w-full sm:w-auto flex-shrink-0 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-150">
-                    Validasi Username
-                </button>
-                
-                <button id="showEmployeeListButton" onclick="openModal()"
-                    class="w-full sm:w-auto flex-shrink-0 px-4 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-150">
-                    Manajemen Pegawai (CRUD)
+                <button id="logoutButton"
+                    class="ml-4 flex-shrink-0 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-700 transition">
+                    Logout
                 </button>
             </div>
+        </header>
 
-            <p id="selectionStatus" class="mt-3 text-sm font-medium text-red-500">
-                ⚠️ Silakan masukkan Username Anda dan tekan Validasi.
-            </p>
-            <p id="employeeIdDisplay" class="mt-1 text-xs text-gray-500 hidden"></p>
+        <!-- DIHAPUS: Langkah 1: Validasi Pegawai tidak lagi diperlukan -->
 
-        </section>
-
-        <!-- Langkah 2: Input Pernyataan -->
-        <section id="step2" class="opacity-50 pointer-events-none transition-opacity duration-500">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 2: Input Pernyataan Tentang Diri Anda</h2>
+        <!-- Langkah 2: Input Pernyataan (Sekarang jadi Langkah 1) -->
+        <!-- PERUBAHAN: Dibuat aktif secara default saat login -->
+        <section id="step2" class="opacity-50 pointer-events-none">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 1: Input Pernyataan Tentang Diri Anda</h2>
             <p class="text-gray-700 mb-6 border-b pb-4">
                 Inputkan empat (4) pernyataan di bawah ini. Komposisi wajib: **3 Pernyataan Benar** dan **1 Pernyataan Salah** tentang diri Anda sendiri.
             </p>
@@ -274,37 +201,37 @@
             </div>
         </section>
 
-        <!-- Langkah 3: Monitoring Status Pengisian -->
+        <!-- Langkah 3: Monitoring Status Pengisian (Sekarang jadi Langkah 2) -->
         <section id="step3" class="mt-10 pt-6 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 3: Monitoring Status Pengisian</h2>
-            <p class="text-gray-600 mb-4">Daftar di bawah menunjukkan status pengisian pernyataan (3 Benar 1 Salah) oleh seluruh pegawai. Status diperbarui secara *real-time*.</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 2: Monitoring Status Pengisian</h2>
+            <p class="text-gray-600 mb-4">Daftar di bawah menunjukkan status pengisian pernyataan (3 Benar 1 Salah) oleh seluruh pengguna Google yang telah login. Status diperbarui secara *real-time*.</p>
             
             <div id="monitoringContainer" class="bg-white rounded-lg shadow overflow-x-auto border border-gray-200">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pegawai (ID)</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pengguna (Google)</th>
+                            <!-- DIHAPUS: Kolom Username -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Pengisian</th>
                         </tr>
                     </thead>
                     <tbody id="monitoringTableBody" class="bg-white divide-y divide-gray-200">
                         <!-- Monitoring rows will be injected here -->
-                        <tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat status pengisian...</td></tr>
+                        <tr><td colspan="3" class="text-center py-4 text-gray-500">Memuat status pengisian...</td></tr>
                     </tbody>
                 </table>
                 <div class="p-4 text-sm text-gray-600 border-t flex justify-between">
-                    <span>Total Pegawai: <span id="totalEmployeesCount">0</span></span>
-                    <span>Sudah Mengisi: <span id="submittedCount" class="font-semibold text-green-600">0</span></span>
+                    <!-- DIHAPUS: Total Pegawai -->
+                    <span>Total Telah Mengisi: <span id="submittedCount" class="font-semibold text-green-600">0</span></span>
                 </div>
             </div>
         </section>
         
-        <!-- Langkah 4: Tantangan Kejujuran (Kuis) - DIBLOKIR SECARA DEFAULT -->
+        <!-- Langkah 4: Tantangan Kejujuran (Kuis) (Sekarang jadi Langkah 3) -->
         <section id="step4" class="mt-10 pt-6 border-t border-gray-200 opacity-50 pointer-events-none transition-opacity duration-500">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Tantangan Kejujuran (Kuis)</h2>
+                <h2 class="text-xl font-bold text-gray-900">Langkah 3: Tantangan Kejujuran (Kuis)</h2>
                 <div class="flex items-center space-x-4">
                     <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-bold shadow-sm">
                         PROGRES: <span id="quizProgressDisplay">0/0</span>
@@ -317,7 +244,7 @@
             
             <div id="quizArea" class="p-6 bg-gray-50 rounded-xl shadow-inner min-h-[250px] flex flex-col justify-center items-center">
                 <!-- Status/Prompt Message -->
-                <p id="quizStatus" class="text-lg text-gray-600 mb-6">❌ Akses diblokir. Harap masukkan Username Anda di Langkah 1 dan selesaikan Langkah 2 (Input Pernyataan).</p>
+                <p id="quizStatus" class="text-lg text-gray-600 mb-6">❌ Akses diblokir. Harap selesaikan Langkah 1 (Input Pernyataan) untuk membuka kuis.</p>
 
                 <!-- NEW START BUTTON -->
                 <button id="startQuizButton"
@@ -333,7 +260,7 @@
                             <div>
                                 <p class="text-sm font-medium text-indigo-700">PERTANYAAN:</p>
                                 <p class="text-xl font-semibold text-gray-800 mt-1">
-                                    Pilih SATU pernyataan yang PALING SALAH mengenai Pegawai: <span id="quizEmployeeName" class="text-indigo-600"></span>
+                                    Pilih SATU pernyataan yang PALING SALAH mengenai Pengguna: <span id="quizEmployeeName" class="text-indigo-600"></span>
                                 </p>
                             </div>
                             <!-- Per-Question Timer -->
@@ -357,17 +284,17 @@
             </div>
         </section>
         
-        <!-- Langkah 5: Papan Skor Pegawai (Leaderboard) -->
+        <!-- Langkah 5: Papan Skor Pegawai (Leaderboard) (Sekarang jadi Langkah 4) -->
         <section id="step5" class="mt-10 pt-6 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 5: Papan Skor Pegawai (Leaderboard)</h2>
-            <p class="text-gray-600 mb-4">Akumulasi skor yang didapatkan setiap pegawai dalam Tantangan Kejujuran (diurutkan berdasarkan skor tertinggi).</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 4: Papan Skor Pengguna (Leaderboard)</h2>
+            <p class="text-gray-600 mb-4">Akumulasi skor yang didapatkan setiap pengguna dalam Tantangan Kejujuran (diurutkan berdasarkan skor tertinggi).</p>
             
             <div id="leaderboardContainer" class="bg-white rounded-lg shadow overflow-x-auto border border-gray-200">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pegawai (Quiz Taker)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pengguna (Quiz Taker)</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Skor</th>
                             <!-- Added Time Column -->
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Waktu</th>
@@ -385,8 +312,9 @@
 
     <!-- Firebase SDKs -->
     <script type="module">
+        // PERUBAHAN: Menambahkan impor untuk Google Auth
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, query, onSnapshot, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- KONFIGURASI FIREBASE (WAJIB DIISI) ---
@@ -403,21 +331,20 @@
         };
 
         // --- GANTI NAMA APLIKASI INI (WAJIB DIISI) ---
-        const appId = 'tantangan-kejujuran';
+        const appId = 'Tantangan Kejujuran';
         
         // --- END OF CONFIGURATION ---
 
 
         let db;
         let auth;
-        let userId = 'anon';
-        let employeeDisplayName = 'Pengguna Anonim'; 
-        let allEmployees = []; 
+        // PERUBAHAN: userId akan diisi oleh onAuthStateChanged
+        let userId = null; 
+        // DIHAPUS: employeeDisplayName, allEmployees, selectedEmployee
         let allSubmissions = [];
         let quizzesTakenIds = new Set(); 
         let currentQuizData = null; 
         let currentScore = 0; 
-        let selectedEmployee = null; 
         let totalEligibleQuestions = 0; 
         
         // Timer Variables
@@ -429,21 +356,11 @@
         // Firestore Collection Paths
         // Menggunakan variabel global __app_id jika tersedia (untuk lingkungan Canvas)
         const effectiveAppId = typeof __app_id !== 'undefined' ? __app_id : appId;
-        const employeeCollectionPath = `/artifacts/${effectiveAppId}/public/data/employees`;
+        // DIHAPUS: employeeCollectionPath, userMapCollectionPath
         const submissionCollectionPath = `/artifacts/${effectiveAppId}/public/data/employee_submissions`;
-        const userMapCollectionPath = `/artifacts/${effectiveAppId}/public/data/user_map`;
         const leaderboardCollectionPath = `/artifacts/${effectiveAppId}/public/data/quiz_leaderboard`;
 
-        // Mock data (dihapus karena tidak relevan lagi di hosting eksternal, 
-        // tapi Anda bisa menambahkannya kembali jika ingin mengisi data awal)
-        const initialMockEmployees = [
-            { name: "Wawan Juswanto", id: "P_001", username: "wawan.juswanto" },
-            { name: "Arifudin Miftakhul Huda", id: "P_002", username: "arifudin.miftakhul" },
-            { name: "Zalik Fakri", id: "P_003", username: "zalik.fakri" },
-            { name: "Sasmika Kusuma", id: "P_004", username: "sasmika.kusuma" },
-            { name: "Alfarisi Muslim", id: "P_005", username: "alfarisi.muslim" }
-            // Tambahkan pegawai lain jika perlu
-        ];
+        // DIHAPUS: initialMockEmployees
 
         // --- UI UTILITIES (Confim Dialog) ---
         
@@ -536,288 +453,147 @@
             return parts.join(' ');
         }
         
-        // --- MODAL (Manajemen Pegawai) LOGIC ---
-        const modal = document.getElementById('employeeListModal');
-        const modalContent = modal.querySelector('div');
+        // DIHAPUS: Modal (Manajemen Pegawai) LOGIC
 
-        window.openModal = function() {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        window.closeModal = function() {
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-                resetForm(); 
-            }, 300); 
-        }
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-
-        // --- FIREBASE INITIALIZATION AND AUTHENTICATION ---
+        // --- FIREBASE INITIALIZATION AND AUTHENTICATION (PERUBAHAN BESAR) ---
         async function initializeFirebase() {
             try {
-                // Determine which configuration to use (Global variables take precedence in Canvas)
+                // Determine which configuration to use
                 const effectiveFirebaseConfig = typeof __firebase_config !== 'undefined' 
                                             ? JSON.parse(__firebase_config) 
                                             : firebaseConfig;
                 
-                // Warn if user is using default/mock config and outside Canvas
                 if (effectiveFirebaseConfig.apiKey === "AIzaSyABv2USzWH2QA3QNKiJmvCjI2N-IwYkUcM" && typeof __firebase_config === 'undefined') {
-                    showMessage("Peringatan: Konfigurasi Firebase Anda belum diganti dari nilai contoh. Kemungkinan akan ada kegagalan koneksi/izin.", "warning");
+                    showMessage("Peringatan: Konfigurasi Firebase Anda belum diganti. Login Google mungkin gagal.", "warning");
                 }
-
 
                 const app = initializeApp(effectiveFirebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // CRITICAL FIX: Ensure user is authenticated to pass Firestore security rules (request.auth != null)
-                if (typeof __initial_auth_token !== 'undefined') {
-                    // Use custom token if provided by the environment (Canvas)
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    // Otherwise, sign in anonymously (required for external hosting/fallback)
-                    await signInAnonymously(auth);
-                }
-                
-                // Set userId from authenticated user
-                userId = auth.currentUser.uid; 
-                
-                console.log("Firebase initialized. User ID:", userId);
-                showMessage(`Login Berhasil! User ID: ${userId.substring(0, 8)}...`, 'success');
-                
-                // Start listening to all key data streams
-                setupEmployeeDataListener();
-                setupMonitoring();
-                setupLeaderboard();
-                
-                // Try to load user display name if they have mapped it before
-                if (db) {
-                     const userMapRef = doc(db, userMapCollectionPath, userId);
-                     const docSnap = await getDoc(userMapRef);
-                     if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        const checkEmployeeData = () => {
-                            if (allEmployees.length > 0) {
-                                const foundEmployee = allEmployees.find(e => e.id === data.employeeId);
-                                if(foundEmployee){
-                                    selectedEmployee = foundEmployee;
-                                    employeeDisplayName = foundEmployee.name;
-                                    updateUIForValidatedUser();
-                                    checkUserSubmissionStatus();
-                                    setupQuizProgressMonitoring(); 
-                                }
-                            } else {
-                                setTimeout(checkEmployeeData, 100); 
-                            }
-                        };
-                        checkEmployeeData();
-                     }
-                }
+                // PERUBAHAN: Menggunakan onAuthStateChanged sebagai gerbang utama aplikasi
+                onAuthStateChanged(auth, async (user) => {
+                    const loginOverlay = document.getElementById('loginOverlay');
+                    const mainAppContainer = document.getElementById('mainAppContainer');
+                    
+                    if (user) {
+                        // --- PENGGUNA LOGIN ---
+                        userId = user.uid;
+                        
+                        document.getElementById('welcomeMessage').textContent = `Login sebagai: ${user.displayName} (${user.email})`;
+                        
+                        // Sembunyikan overlay dan tampilkan aplikasi
+                        loginOverlay.classList.add('hidden');
+                        mainAppContainer.classList.remove('hidden');
+                        
+                        showMessage(`Login Berhasil! Selamat datang, ${user.displayName}.`, 'success');
+                        
+                        // Mulai memuat data setelah login berhasil
+                        // DIHAPUS: setupEmployeeDataListener();
+                        setupMonitoring();
+                        setupLeaderboard();
+                        
+                        // PERUBAHAN: Langsung cek status submisi user ini
+                        checkUserSubmissionStatus();
+                        setupQuizProgressMonitoring(); 
+
+                    } else {
+                        // --- PENGGUNA LOGOUT ---
+                        userId = null;
+                        
+                        // Tampilkan overlay dan sembunyikan aplikasi
+                        loginOverlay.classList.remove('hidden');
+                        mainAppContainer.classList.add('hidden');
+                        document.getElementById('loginStatus').classList.add('hidden');
+                        document.getElementById('googleLoginButton').disabled = false;
+                        
+                        // Reset UI
+                        resetUIOnLogout();
+                    }
+                });
 
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                if (error.code === 'auth/configuration-not-found' || error.message.includes('permission denied')) {
-                    showMessage("LOGIN/KONEKSI GAGAL: Pastikan 'Anonymous Sign-In' telah diaktifkan di Firebase Console ANDA, dan semua konfigurasi (apiKey, projectId, dll) sudah benar.", "error");
-                } else {
-                    showMessage(`Gagal terhubung ke server. Error: ${error.message}`, "error");
-                }
-            }
-        }
-
-        // --- EMPLOYEE CRUD OPERATIONS ---
-        const employeeForm = document.getElementById('employeeForm');
-        
-        window.resetForm = function() {
-            employeeForm.reset();
-            document.getElementById('employeeDocId').value = '';
-            document.getElementById('formTitle').textContent = 'Tambah Pegawai Baru';
-            document.getElementById('saveEmployeeButton').textContent = 'Simpan';
-            document.getElementById('cancelEditButton').classList.add('hidden');
-        }
-
-        window.editEmployee = function(docId, name, id, username) {
-            document.getElementById('employeeDocId').value = docId;
-            document.getElementById('inputName').value = name;
-            document.getElementById('inputId').value = id;
-            document.getElementById('inputUsername').value = username;
-            document.getElementById('formTitle').textContent = `Edit Pegawai: ${name}`;
-            document.getElementById('saveEmployeeButton').textContent = 'Update';
-            document.getElementById('cancelEditButton').classList.remove('hidden');
-        }
-
-        window.deleteEmployee = async function(docId, name) {
-            const confirmed = await showConfirmation(`Apakah Anda yakin ingin menghapus pegawai "${name}"? Tindakan ini tidak dapat dibatalkan.`, 'Hapus', 'bg-red-600 hover:bg-red-700');
-            if(confirmed) {
-                try {
-                    // Operasi ini memerlukan otentikasi
-                    await deleteDoc(doc(db, employeeCollectionPath, docId));
-                    showMessage(`Pegawai "${name}" berhasil dihapus.`, 'success');
-                } catch (error) {
-                    console.error("Error deleting employee: ", error);
-                    showMessage(`Gagal menghapus pegawai. Error: ${error.message}`, "error");
-                }
+                showMessage(`Gagal inisialisasi Firebase. Error: ${error.message}`, "error");
             }
         }
         
-        employeeForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const docId = document.getElementById('employeeDocId').value;
-            const name = document.getElementById('inputName').value;
-            const id = document.getElementById('inputId').value.toUpperCase();
-            const username = document.getElementById('inputUsername').value.toLowerCase();
-
-            if (!name || !id || !username) {
-                showMessage("Semua field wajib diisi.", "error");
-                return;
-            }
-
-            const employeeData = { name, id, username };
+        function resetUIOnLogout() {
+            // Mereset state aplikasi saat logout
+            // DIHAPUS: Logika reset Step 1 (validasi)
             
+            document.getElementById('step2').classList.add('opacity-50', 'pointer-events-none');
+            document.querySelectorAll('#step2 textarea').forEach(ta => {
+                ta.disabled = false;
+                ta.value = '';
+            });
+            document.getElementById('submitButton').disabled = false;
+            document.getElementById('submitButton').textContent = 'Simpan Data Pernyataan';
+            
+            document.getElementById('step4').classList.add('opacity-50', 'pointer-events-none');
+            // Reset state kuis
+            currentScore = 0;
+            quizzesTakenIds = new Set();
+            totalAccumulatedTime = 0;
+            document.getElementById('userScoreDisplay').textContent = '0';
+            document.getElementById('quizArea').innerHTML = `
+                <p id="quizStatus" class="text-lg text-gray-600 mb-6">❌ Akses diblokir. Silakan login dan selesaikan Langkah 1 untuk membuka kuis.</p>
+                <button id="startQuizButton" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
+                    Mulai Tantangan Kejujuran
+                </button>
+                <div id="quizContent" class="w-full hidden mt-4">
+                    <!-- ... (Struktur HTML kuis dikembalikan) ... -->
+                </div>
+            `;
+            // Re-attach listener ke tombol start (karena innerHTML menghapusnya)
+            document.getElementById('startQuizButton').addEventListener('click', () => {
+                 document.getElementById('quizStatus').classList.add('hidden');
+                 document.getElementById('startQuizButton').classList.add('hidden');
+                 document.getElementById('quizContent').classList.remove('hidden');
+                 startQuiz();
+            });
+        }
+        
+        // PERUBAHAN: Listener untuk tombol Login dan Logout
+        document.getElementById('googleLoginButton').addEventListener('click', async () => {
+            document.getElementById('loginStatus').classList.remove('hidden');
+            document.getElementById('googleLoginButton').disabled = true;
+            
+            const provider = new GoogleAuthProvider();
             try {
-                // Operasi ini memerlukan otentikasi
-                if (docId) { 
-                    const docRef = doc(db, employeeCollectionPath, docId);
-                    await updateDoc(docRef, employeeData);
-                    showMessage("Data pegawai berhasil diperbarui.", 'success');
-                } else { 
-                    await addDoc(collection(db, employeeCollectionPath), employeeData);
-                    showMessage("Pegawai baru berhasil ditambahkan.", 'success');
-                }
-                resetForm();
+                // signInWithPopup akan memicu onAuthStateChanged
+                await signInWithPopup(auth, provider);
+                // onAuthStateChanged akan menangani sisanya
             } catch (error) {
-                console.error("Error saving employee: ", error);
-                showMessage(`Gagal menyimpan data pegawai. Error: ${error.message}`, "error");
+                console.error("Google Sign-In failed:", error);
+                showMessage(`Login Google Gagal. Error: ${error.message}`, "error");
+                document.getElementById('loginStatus').classList.add('hidden');
+                document.getElementById('googleLoginButton').disabled = false;
             }
         });
-        
-        async function setupEmployeeDataListener() {
+
+        document.getElementById('logoutButton').addEventListener('click', async () => {
             try {
-                const q = query(collection(db, employeeCollectionPath));
-                
-                // Cek jika koleksi kosong, tambahkan mock data jika ada
-                // Operasi ini memerlukan otentikasi
-                const initialSnapshot = await getDocs(q);
-                if (initialSnapshot.empty && initialMockEmployees.length > 0) {
-                    console.log("Employee collection is empty. Populating with mock data...");
-                    const batch = [];
-                    for (const emp of initialMockEmployees) {
-                        batch.push(addDoc(collection(db, employeeCollectionPath), emp));
-                    }
-                    await Promise.all(batch);
-                    console.log("Mock data populated.");
-                }
-
-                onSnapshot(q, (snapshot) => {
-                    const employees = [];
-                    snapshot.forEach((doc) => {
-                        employees.push({ docId: doc.id, ...doc.data() });
-                    });
-                    
-                    allEmployees = employees.sort((a, b) => a.id.localeCompare(b.id));
-
-                    renderEmployeeList(allEmployees);
-                    renderMonitoringTable(allEmployees, allSubmissions);
-                }, (error) => {
-                    console.error("Error listening to employee data: ", error);
-                    showMessage(`Gagal memuat data pegawai (Error: ${error.message}). Harap aktifkan login anonim.`, "error");
-                });
+                await signOut(auth);
+                // onAuthStateChanged akan menangani sisanya
+                showMessage("Anda berhasil logout.", "success");
             } catch (error) {
-                 console.error("Error setting up employee listener: ", error);
-                 showMessage(`Gagal memuat data pegawai (Error: ${error.message}). Harap aktifkan login anonim.`, "error");
+                console.error("Logout failed:", error);
+                showMessage(`Gagal logout. Error: ${error.message}`, "error");
             }
-        }
-        
-        function renderEmployeeList(employees) {
-            const tableBody = document.getElementById('employeeListTableBody');
-            if (employees.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Belum ada data pegawai.</td></tr>';
-                return;
-            }
-            
-            tableBody.innerHTML = employees.map((emp, index) => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${emp.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${emp.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${emp.username}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <button onclick="editEmployee('${emp.docId}', '${emp.name}', '${emp.id}', '${emp.username}')" class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                        <button onclick="deleteEmployee('${emp.docId}', '${emp.name}')" class="text-red-600 hover:text-red-900">Hapus</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+        });
+
+
+        // DIHAPUS: EMPLOYEE CRUD OPERATIONS
+        // DIHAPUS: CORE APPLICATION LOGIC (Validasi Step 1)
 
         // --- CORE APPLICATION LOGIC ---
 
-        // Step 1: Validate Username
-        document.getElementById('validateUsernameButton').addEventListener('click', async () => {
-            const username = document.getElementById('usernameInput').value.trim().toLowerCase();
-            if (!username) {
-                showMessage("Username tidak boleh kosong.", "warning");
-                return;
-            }
-            
-            const foundEmployee = allEmployees.find(emp => emp.username === username);
-
-            if (foundEmployee) {
-                selectedEmployee = foundEmployee;
-                employeeDisplayName = selectedEmployee.name; 
-                
-                try {
-                    // Operasi ini memerlukan otentikasi
-                    const userMapRef = doc(db, userMapCollectionPath, userId);
-                    await setDoc(userMapRef, { employeeId: selectedEmployee.id, employeeName: selectedEmployee.name });
-                    console.log(`User ${userId} mapped to employee ${selectedEmployee.id}`);
-                } catch(error) {
-                    console.error("Failed to map user:", error);
-                    showMessage(`Gagal memetakan user (Error: ${error.message}). Pastikan login anonim aktif.`, "error");
-                }
-
-                updateUIForValidatedUser();
-                await checkUserSubmissionStatus();
-                setupQuizProgressMonitoring();
-            } else {
-                document.getElementById('selectionStatus').innerHTML = `
-                    <span class="text-red-500 font-bold">❌ Username tidak ditemukan.</span> 
-                    Pastikan username Anda benar atau hubungi administrator.
-                `;
-                document.getElementById('step2').classList.add('opacity-50', 'pointer-events-none');
-            }
-        });
-        
-        function updateUIForValidatedUser() {
-             document.getElementById('selectionStatus').innerHTML = `
-                <span class="text-green-600 font-bold">✔️ Validasi Berhasil!</span> 
-                Selamat datang, <strong class="text-indigo-700">${selectedEmployee.name}</strong>. Silakan isi pernyataan di bawah.
-            `;
-            document.getElementById('employeeIdDisplay').textContent = `ID Pegawai Anda: ${selectedEmployee.id}`;
-            document.getElementById('employeeIdDisplay').classList.remove('hidden');
-            document.getElementById('usernameInput').value = selectedEmployee.username;
-            document.getElementById('usernameInput').disabled = true;
-            document.getElementById('validateUsernameButton').disabled = true;
-            document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
-        }
-
-        // Step 2: Submit Statements
+        // Step 1 (Dulu Step 2): Submit Statements
         document.getElementById('submitButton').addEventListener('click', async () => {
-            if (!selectedEmployee) {
-                showMessage("Harap validasi Username Anda terlebih dahulu.", "error");
+            // PERUBAHAN: Cek userId, bukan selectedEmployee
+            if (!userId) {
+                showMessage("Harap login terlebih dahulu.", "error");
                 return;
             }
 
@@ -842,22 +618,22 @@
                 return;
             }
             
-            const confirmed = await showConfirmation(`Anda akan menyimpan pernyataan untuk ${selectedEmployee.name}. Apakah Anda yakin?`, 'Simpan', 'bg-indigo-600 hover:bg-indigo-700');
+            const confirmed = await showConfirmation(`Anda akan menyimpan pernyataan untuk ${auth.currentUser.displayName}. Apakah Anda yakin?`, 'Simpan', 'bg-indigo-600 hover:bg-indigo-700');
             if(!confirmed) return;
 
             showLoading(true);
 
             try {
-                // Operasi ini memerlukan otentikasi
+                // PERUBAHAN: Data disimpan berdasarkan userId
                 const submissionData = {
-                    employeeId: selectedEmployee.id,
-                    employeeName: selectedEmployee.name,
-                    username: selectedEmployee.username,
+                    googleName: auth.currentUser.displayName,
+                    googleEmail: auth.currentUser.email,
                     statements: statements,
                     submittedAt: new Date()
                 };
 
-                const docRef = doc(db, submissionCollectionPath, selectedEmployee.id);
+                // PERUBAHAN: Dokumen di-set menggunakan userId
+                const docRef = doc(db, submissionCollectionPath, userId);
                 await setDoc(docRef, submissionData);
 
                 showMessage("Pernyataan Anda berhasil disimpan!", "success");
@@ -875,10 +651,12 @@
         });
 
         async function checkUserSubmissionStatus() {
-            if (!selectedEmployee) return;
+            // PERUBAHAN: Cek userId
+            if (!userId || !db) return;
+            
             try {
-                // Operasi ini memerlukan otentikasi
-                const docRef = doc(db, submissionCollectionPath, selectedEmployee.id);
+                // PERUBAHAN: Ambil dokumen berdasarkan userId
+                const docRef = doc(db, submissionCollectionPath, userId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -898,7 +676,12 @@
                     document.getElementById('submitButton').textContent = 'Data Sudah Tersimpan';
                     showMessage("Anda sudah mengisi pernyataan. Anda dapat memulai kuis.", 'info');
                     
+                    // Aktifkan form input
+                    document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
                     unlockQuizSection();
+                } else {
+                    // PERUBAHAN: Jika user belum submit, pastikan form-nya aktif
+                    document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
                 }
             } catch (error) {
                  console.error("Error checking submission status: ", error);
@@ -906,19 +689,23 @@
             }
         }
         
-        // Step 3: Monitoring
+        // Step 2 (Dulu Step 3): Monitoring
         function setupMonitoring() {
+            if (!db) return;
             const q = query(collection(db, submissionCollectionPath));
-            // Operasi ini memerlukan otentikasi
+            
             onSnapshot(q, (snapshot) => {
                 const submissions = [];
                 snapshot.forEach((doc) => {
-                    submissions.push(doc.data());
+                    // PERUBAHAN: Simpan userId (doc.id)
+                    submissions.push({ userId: doc.id, ...doc.data() });
                 });
                 allSubmissions = submissions;
-                renderMonitoringTable(allEmployees, allSubmissions);
+                // PERUBAHAN: Kirim 'submissions' bukan 'allEmployees'
+                renderMonitoringTable(allSubmissions);
                 
-                totalEligibleQuestions = allSubmissions.filter(sub => sub.employeeId !== selectedEmployee?.id).length;
+                // PERUBAHAN: Filter berdasarkan userId
+                totalEligibleQuestions = allSubmissions.filter(sub => sub.userId !== userId).length;
                 updateQuizProgressDisplay();
             }, (error) => {
                 console.error("Error listening to submissions: ", error);
@@ -926,34 +713,31 @@
             });
         }
         
-        function renderMonitoringTable(employees, submissions) {
+        // PERUBAHAN: Parameter diubah ke 'submissions'
+        function renderMonitoringTable(submissions) {
             const tableBody = document.getElementById('monitoringTableBody');
-            const submittedIds = new Set(submissions.map(s => s.employeeId));
             
-            if (employees.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat data pegawai...</td></tr>';
+            if (submissions.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada data submisi.</td></tr>';
                 return;
             }
 
-            tableBody.innerHTML = employees.map((emp, index) => `
+            // PERUBAHAN: Iterasi 'submissions' dan tampilkan data Google
+            tableBody.innerHTML = submissions.map((sub, index) => `
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${emp.name} <span class="text-gray-400">(${emp.id})</span></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${emp.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${sub.googleName || 'User Tanpa Nama'} <span class="text-gray-400">(${sub.googleEmail})</span></td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        ${submittedIds.has(emp.id)
-                            ? '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sudah Mengisi</span>'
-                            : '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Belum Mengisi</span>'
-                        }
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sudah Mengisi</span>
                     </td>
                 </tr>
             `).join('');
             
-            document.getElementById('totalEmployeesCount').textContent = employees.length;
-            document.getElementById('submittedCount').textContent = submittedIds.size;
+            // PERUBAHAN: Update hitungan
+            document.getElementById('submittedCount').textContent = submissions.length;
         }
 
-        // --- QUIZ LOGIC (Step 4) ---
+        // --- QUIZ LOGIC (Step 3) ---
 
         // Timer Control Functions
         function startQuestionTimer() {
@@ -988,34 +772,45 @@
             const quizStatus = document.getElementById('quizStatus');
             const startQuizButton = document.getElementById('startQuizButton');
 
+            // Cek jika tombol startQuizButton ada (karena bisa dihapus oleh showQuizEnd)
+            if (!startQuizButton || !quizStatus) return;
+
             const allFilled = allSubmissions.length >= 2; 
-            const userHasFilled = allSubmissions.some(sub => sub.employeeId === selectedEmployee?.id);
+            // PERUBAHAN: Cek berdasarkan userId
+            const userHasFilled = allSubmissions.some(sub => sub.userId === userId);
 
             if (userHasFilled) {
                 if (allFilled) {
                     quizStatus.textContent = '✅ Anda sudah siap! Tekan tombol di bawah untuk memulai Tantangan Kejujuran.';
                     startQuizButton.disabled = false;
                 } else {
-                    quizStatus.textContent = '⏳ Menunggu pegawai lain mengisi pernyataan agar kuis dapat dimulai (minimal 2 pengisi).';
+                    quizStatus.textContent = '⏳ Menunggu pengguna lain mengisi pernyataan agar kuis dapat dimulai (minimal 2 pengisi).';
                     startQuizButton.disabled = true;
                 }
                 startQuizButton.classList.remove('hidden');
             } else {
-                 quizStatus.textContent = '❌ Anda harus mengisi pernyataan di Langkah 2 terlebih dahulu untuk memulai kuis.';
+                 quizStatus.textContent = '❌ Anda harus mengisi pernyataan di Langkah 1 terlebih dahulu untuk memulai kuis.';
                  startQuizButton.classList.add('hidden');
             }
         }
         
+        // Memastikan listener terpasang saat elemen dibuat
         document.getElementById('startQuizButton').addEventListener('click', () => {
-             document.getElementById('quizStatus').classList.add('hidden');
-             document.getElementById('startQuizButton').classList.add('hidden');
-             document.getElementById('quizContent').classList.remove('hidden');
+             const quizStatus = document.getElementById('quizStatus');
+             const startQuizButton = document.getElementById('startQuizButton');
+             const quizContent = document.getElementById('quizContent');
+             
+             if (quizStatus) quizStatus.classList.add('hidden');
+             if (startQuizButton) startQuizButton.classList.add('hidden');
+             if (quizContent) quizContent.classList.remove('hidden');
+             
              startQuiz();
         });
         
         function setupQuizProgressMonitoring() {
-            if (!userId) return;
-            // Operasi ini memerlukan otentikasi
+            // Data progres kuis disimpan menggunakan Google UID (userId)
+            if (!userId || !db) return;
+            
             const leaderboardDocRef = doc(db, leaderboardCollectionPath, userId);
             onSnapshot(leaderboardDocRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -1038,13 +833,15 @@
         }
         
         function startQuiz() {
-            if (!selectedEmployee) {
-                showMessage("Pegawai tidak terautentikasi. Harap validasi username Anda.", "error");
+            // PERUBAHAN: Cek userId
+            if (!userId) {
+                showMessage("Pengguna tidak terautentikasi. Harap login ulang.", "error");
                 return;
             }
 
+            // PERUBAHAN: Filter quizPool berdasarkan userId
             const quizPool = allSubmissions.filter(sub => {
-                return sub.employeeId !== selectedEmployee.id && !quizzesTakenIds.has(sub.employeeId);
+                return sub.userId !== userId && !quizzesTakenIds.has(sub.userId);
             });
 
             if (quizPool.length === 0) {
@@ -1060,7 +857,8 @@
         }
         
         function renderQuizQuestion(quizData) {
-            document.getElementById('quizEmployeeName').textContent = quizData.employeeName;
+            // PERUBAHAN: Tampilkan googleName
+            document.getElementById('quizEmployeeName').textContent = quizData.googleName || 'User Anonim';
             
             const optionsContainer = document.getElementById('quizOptionsContainer');
             const shuffledStatements = [...quizData.statements].sort(() => Math.random() - 0.5);
@@ -1107,17 +905,19 @@
             document.getElementById('nextQuizButton').classList.remove('hidden');
             document.getElementById('userScoreDisplay').textContent = currentScore;
             
-            quizzesTakenIds.add(currentQuizData.employeeId);
+            // PERUBAHAN: Simpan userId
+            quizzesTakenIds.add(currentQuizData.userId);
             totalAccumulatedTime += currentQuestionTimeElapsed;
 
             try {
-                // Operasi ini memerlukan otentikasi
+                // Menyimpan progres kuis menggunakan Google UID (userId)
                 const leaderboardDocRef = doc(db, leaderboardCollectionPath, userId);
+                // PERUBAHAN: Simpan data berdasarkan Google Auth, hapus data pegawai
                 await setDoc(leaderboardDocRef, {
                     score: currentScore,
                     quizzesTakenIds: Array.from(quizzesTakenIds),
-                    employeeName: selectedEmployee.name,
-                    employeeId: selectedEmployee.id,
+                    googleName: auth.currentUser.displayName,
+                    googleEmail: auth.currentUser.email,
                     totalAccumulatedTime: totalAccumulatedTime, 
                     lastUpdated: new Date()
                 }, { merge: true });
@@ -1150,14 +950,16 @@
             `;
         }
 
-        // --- LEADERBOARD (Step 5) ---
+        // --- LEADERBOARD (Step 4) ---
         function setupLeaderboard() {
+            if (!db) return;
             const q = query(collection(db, leaderboardCollectionPath));
-            // Operasi ini memerlukan otentikasi
+            
             onSnapshot(q, (snapshot) => {
                 const scores = [];
                 snapshot.forEach((doc) => {
-                    scores.push({ ...doc.data() });
+                    // PERUBAHAN: Simpan userId
+                    scores.push({ userId: doc.id, ...doc.data() });
                 });
                 
                 // Sort by score (desc), then time (asc)
@@ -1186,10 +988,14 @@
                 const rankIcon = index === 0 ? '🏆' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : ''));
                 const totalTime = entry.totalAccumulatedTime || 0;
                 
+                // PERUBAHAN: Tampilkan googleName
+                const displayName = entry.googleName || 'User Tanpa Nama';
+                
                 return `
-                     <tr class="hover:bg-gray-50 ${entry.employeeId === selectedEmployee?.id ? 'bg-indigo-50 font-bold' : ''}">
+                     <!-- PERUBAHAN: Sorot baris berdasarkan userId -->
+                     <tr class="hover:bg-gray-50 ${entry.userId === userId ? 'bg-indigo-50 font-bold' : ''}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${rankClass}">${index + 1} ${rankIcon}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${entry.employeeName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${displayName}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-indigo-600">${entry.score}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600">${formatTime(totalTime)}</td>
                     </tr>
@@ -1199,9 +1005,11 @@
 
         // --- INITIALIZE ON PAGE LOAD ---
         window.onload = function() {
+            // Memulai proses autentikasi
             initializeFirebase();
         };
 
     </script>
 </body>
 </html>
+
