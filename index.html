@@ -12,6 +12,8 @@
         .btn-primary:hover { background-color: #4338ca; }
         .btn-secondary { background-color: #e5e7eb; color: #1f2937; transition: background-color 0.2s; }
         .btn-secondary:hover { background-color: #d1d5db; }
+        .btn-danger { background-color: #ef4444; color: white; transition: background-color 0.2s; }
+        .btn-danger:hover { background-color: #dc2626; }
         .quiz-option { cursor: pointer; transition: transform 0.1s; }
         .quiz-option:hover { transform: scale(1.02); }
         .quiz-selected { border-width: 3px; border-color: #4f46e5; background-color: #eef2ff; }
@@ -39,11 +41,16 @@
             <!-- Header dan Pengguna -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 card bg-white/50 backdrop-blur-sm sticky top-0 z-10">
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2 md:mb-0">Aplikasi Integritas Pegawai</h1>
-                <div class="text-right flex items-center space-x-4">
-                    <p id="welcomeMessage" class="text-sm font-medium text-gray-600"></p>
+                <div class="text-right flex flex-wrap items-center space-x-2 space-y-2 md:space-y-0 mt-2 md:mt-0">
+                    <p id="welcomeMessage" class="text-sm font-medium text-gray-600 w-full md:w-auto"></p>
                     <button id="resetDataButton" class="text-xs font-medium text-red-600 hover:text-red-800 px-3 py-1 rounded-full border border-red-300 transition duration-150 btn-secondary">
                         Hapus & Reset Data Saya
                     </button>
+                    <!-- TOMBOL ADMIN BARU -->
+                    <button id="adminResetAllDataButton" class="text-xs font-medium px-3 py-1 rounded-full transition duration-150 btn-danger">
+                        Admin: Hapus SELURUH Data Aplikasi
+                    </button>
+                    <!-- END TOMBOL ADMIN -->
                     <button id="signOutButton" class="text-sm font-semibold py-1 px-3 rounded-xl btn-secondary">Keluar</button>
                 </div>
             </div>
@@ -95,7 +102,7 @@
                 <h2 class="text-xl font-semibold mb-4 text-gray-800">Langkah 3: Tes Kejujuran (Kuis)</h2>
                 
                 <div id="quizProgress" class="mb-4">
-                    <p class="text-sm font-medium text-gray-700 mb-1">Progres Kuis: <span id="quizProgressText">0/10</span></p>
+                    <p class="text-sm font-medium text-gray-700 mb-1">Progres Kuis: <span id="quizProgressText">0/4</span></p>
                     <div class="w-full bg-gray-200 rounded-full h-2.5">
                         <div id="quizProgressBar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
                     </div>
@@ -156,8 +163,7 @@
             query, 
             getDocs, 
             deleteDoc,
-            updateDoc,
-            arrayUnion 
+            writeBatch // Import writeBatch untuk menghapus banyak dokumen
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
@@ -175,8 +181,7 @@
         let quizUnsubscribe = null;
         let leaderboardUnsubscribe = null;
         
-        const submissionCollectionPath = `artifacts/${appId}/users/${userId || 'placeholder'}/submissions`;
-        const quizCollectionPath = `artifacts/${appId}/public/data/quiz_questions`;
+        // Path Collection Public
         const employeeCollectionPath = `artifacts/${appId}/public/data/employee_monitoring`;
         const leaderboardCollectionPath = `artifacts/${appId}/public/data/leaderboard`;
 
@@ -201,10 +206,13 @@
             box.classList.remove('hidden');
         }
 
-        function showLoading(isLoading) {
-            const btn = document.getElementById('submitButton');
+        function showLoading(isLoading, buttonId = 'submitButton') {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            
             if (isLoading) {
                 btn.disabled = true;
+                btn.dataset.originalText = btn.textContent;
                 btn.innerHTML = `
                     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -214,7 +222,7 @@
                 `;
             } else {
                 btn.disabled = false;
-                btn.textContent = 'Simpan Data Pernyataan';
+                btn.textContent = btn.dataset.originalText || 'Simpan Data Pernyataan';
             }
         }
 
@@ -303,12 +311,12 @@
             document.querySelectorAll('#step2 textarea').forEach(ta => { ta.value = ''; ta.disabled = false; });
             document.getElementById('submitButton').disabled = false;
             document.getElementById('submitButton').textContent = 'Simpan Data Pernyataan';
-            document.getElementById('step2').classList.add('opacity-50', 'pointer-events-none');
-            
+            document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none'); // Selalu aktifkan setelah reset
+
             // Nonaktifkan Langkah 3 (Kuis)
             document.getElementById('step4').classList.add('opacity-50', 'pointer-events-none');
             // Reset state kuis
-            document.getElementById('quizProgressText').textContent = '0/10';
+            document.getElementById('quizProgressText').textContent = '0/4';
             document.getElementById('quizProgressBar').style.width = '0%';
             document.getElementById('quizArea').innerHTML = '<p class="text-gray-500 text-center py-8">Lengkapi Langkah 1 untuk memulai kuis.</p>';
             document.getElementById('submitQuizButton').classList.add('hidden');
@@ -471,7 +479,12 @@
                     const data = doc.data();
                     
                     const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 transition duration-150';
+                    // Tambahkan class khusus jika baris ini adalah user yang sedang login
+                    if (data.userId === userId) {
+                         row.classList.add('bg-indigo-50', 'font-semibold');
+                    } else {
+                         row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
+                    }
 
                     const submissionDate = data.submissionTime?.toDate ? data.submissionTime.toDate().toLocaleString('id-ID') : 'N/A';
                     const statusText = data.hasSubmitted ? 
@@ -510,10 +523,10 @@
                     <p class="font-semibold mb-3 text-gray-800">Pernyataan ${index + 1}:</p>
                     <p class="text-gray-700 mb-4 italic">"${statement.text}"</p>
                     <div class="flex space-x-4">
-                        <button data-index="${index}" data-answer="true" class="quiz-option flex-1 py-2 rounded-xl border border-green-400 text-green-700 bg-green-50 text-sm font-medium hover:bg-green-100">
+                        <button data-index="${index}" data-answer="Benar" class="quiz-option flex-1 py-2 rounded-xl border border-green-400 text-green-700 bg-green-50 text-sm font-medium hover:bg-green-100">
                             Benar (True)
                         </button>
-                        <button data-index="${index}" data-answer="false" class="quiz-option flex-1 py-2 rounded-xl border border-red-400 text-red-700 bg-red-50 text-sm font-medium hover:bg-red-100">
+                        <button data-index="${index}" data-answer="Salah" class="quiz-option flex-1 py-2 rounded-xl border border-red-400 text-red-700 bg-red-50 text-sm font-medium hover:bg-red-100">
                             Salah (False)
                         </button>
                     </div>
@@ -535,7 +548,7 @@
         function handleQuizAnswer(event) {
             const button = event.target;
             const index = parseInt(button.dataset.index);
-            const answer = button.dataset.answer === 'true' ? 'Benar' : 'Salah';
+            const answer = button.dataset.answer; // 'Benar' atau 'Salah'
             
             userAnswers[index] = answer;
             
@@ -543,13 +556,14 @@
             button.closest('div').querySelectorAll('.quiz-option').forEach(btn => {
                 btn.classList.remove('quiz-selected');
                 btn.classList.remove('bg-indigo-100');
-                btn.classList.add('bg-green-50', 'bg-red-50'); // Reset background for unselected
+                // Tambahkan kembali warna default agar tidak terlihat polos
+                const isGreen = btn.dataset.answer === 'Benar';
+                btn.classList.add(isGreen ? 'bg-green-50' : 'bg-red-50'); 
             });
 
             // Tandai seleksi baru
-            button.classList.add('quiz-selected');
-            button.classList.add('bg-indigo-100'); // Uniform color for selection
-            button.classList.remove('bg-green-50', 'bg-red-50');
+            button.classList.add('quiz-selected', 'bg-indigo-100'); 
+            button.classList.remove('bg-green-50', 'bg-red-50'); // Hapus warna default
             
             updateQuizProgressDisplay();
         }
@@ -577,24 +591,22 @@
 
             // Hitung Skor
             let correctCount = 0;
-            let totalScore = 0; // Skor dari 100 (10 pertanyaan * 10 poin)
+            const totalQuestions = currentQuiz.length;
             
             currentQuiz.forEach((statement, index) => {
-                // Jawaban Kuis adalah persepsi pengguna: Apakah pernyataan itu Benar (True) atau Salah (False)
+                // Jawaban Kuis (Persepsi Penilai)
                 const userAnswer = userAnswers[index]; // 'Benar' atau 'Salah'
                 
-                // Status Sebenarnya adalah status yang disubmit pengguna di Langkah 1
+                // Status Sebenarnya (Isi Langkah 1)
                 const actualStatus = statement.status; // 'Benar' atau 'Salah'
                 
-                // Jika persepsi pengguna (userAnswer) SAMA dengan status sebenarnya (actualStatus)
-                // Berarti pengguna berhasil menebak kejujuran orang lain (dalam hal ini, diri sendiri)
-                // Ini dihitung sebagai skor pada kuis (Simulasi: Penilai pihak ketiga)
+                // Jika persepsi penilai SAMA dengan status sebenarnya (berhasil mendeteksi)
                 if (userAnswer === actualStatus) {
                     correctCount++;
                 }
             });
             
-            totalScore = (correctCount / currentQuiz.length) * 100; // Normalisasi ke 100
+            const totalScore = (correctCount / totalQuestions) * 100; // Normalisasi ke 100
             
             try {
                 // 1. Simpan hasil kuis ke database pribadi
@@ -602,7 +614,7 @@
                 await setDoc(quizResultRef, {
                     score: totalScore,
                     correctAnswers: correctCount,
-                    totalQuestions: currentQuiz.length,
+                    totalQuestions: totalQuestions,
                     quizSubmittedAt: new Date()
                 });
                 
@@ -620,7 +632,7 @@
                 const resultBox = document.getElementById('quizResult');
                 resultBox.classList.remove('hidden', 'bg-red-100', 'text-red-800');
                 resultBox.classList.add('bg-green-100', 'text-green-800');
-                resultBox.innerHTML = `Selamat! Anda berhasil menyelesaikan kuis. Skor Anda: <strong>${correctCount}/${currentQuiz.length} (${totalScore.toFixed(2)}%)</strong>.`;
+                resultBox.innerHTML = `Selamat! Anda berhasil menyelesaikan kuis. Skor Anda: <strong>${correctCount}/${totalQuestions} (${totalScore.toFixed(2)}%)</strong>.`;
 
                 // Nonaktifkan kuis setelah submit
                 document.getElementById('quizArea').querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
@@ -695,7 +707,13 @@
 
                 leaderboardData.forEach((data, index) => {
                     const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 transition duration-150';
+                    
+                    const isCurrentUser = data.userId === userId;
+                    if (isCurrentUser) {
+                         row.classList.add('bg-indigo-50', 'font-semibold', 'border-2', 'border-indigo-200');
+                    } else {
+                         row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
+                    }
 
                     const rankClass = index === 0 ? 'bg-yellow-100 text-yellow-800 font-bold' : 
                                       index === 1 ? 'bg-gray-100 text-gray-800 font-semibold' :
@@ -715,14 +733,14 @@
             });
         }
         
-        // --- FITUR BARU: RESET DATA PENGGUNA ---
+        // --- FITUR: RESET DATA PENGGUNA INDIVIDUAL ---
         document.getElementById('resetDataButton').addEventListener('click', async () => {
             if (!userId) {
                 showMessage("Anda harus login Google untuk menghapus data Anda.", 'error');
                 return;
             }
             
-            if (!confirm("APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA PERNYATAAN DAN HASIL KUIS ANDA? Tindakan ini tidak dapat dibatalkan.")) {
+            if (!confirm("APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA PRIBADI ANDA? Ini termasuk Pernyataan, Hasil Kuis, dan entri Leaderboard. Tindakan ini tidak dapat dibatalkan.")) {
                  return;
             }
 
@@ -741,6 +759,8 @@
                 
                 // 4. Hapus dokumen dari Monitoring Publik
                 const employeeDocRef = doc(db, employeeCollectionPath, userId);
+                // Hanya set 'hasSubmitted' ke false, atau hapus jika ingin total reset
+                // Kali ini kita hapus total untuk simulasi reset penuh
                 await deleteDoc(employeeDocRef);
 
 
@@ -763,13 +783,82 @@
                 showMessage(`Gagal menghapus data: ${error.message}. Coba lagi.`, 'error');
             }
         });
+
+        // --- FITUR BARU: ADMIN HAPUS SEMUA DATA ---
+        document.getElementById('adminResetAllDataButton').addEventListener('click', async () => {
+            if (!userId) {
+                showMessage("Admin Reset gagal. Anda harus login Google.", 'error');
+                return;
+            }
+
+            if (!confirm("PERINGATAN ADMIN! Tindakan ini akan menghapus SEMUA data pernyataan dan kuis dari SELURUH pengguna di aplikasi ini. Lanjutkan? Ketik 'HAPUS SEMUA' untuk konfirmasi.")) {
+                 return;
+            }
+            
+            // Konfirmasi kedua
+            if (window.prompt("KONFIRMASI AKHIR. Ketik kata 'HAPUS SEMUA' untuk melanjutkan.") !== 'HAPUS SEMUA') {
+                showMessage("Penghapusan seluruh data dibatalkan.", 'info');
+                return;
+            }
+
+
+            showLoading(true, 'adminResetAllDataButton');
+            showMessage("Memulai proses penghapusan data SELURUH pengguna. Mohon tunggu...", 'error');
+
+            try {
+                // 1. Ambil semua User ID dari koleksi Monitoring (sumber data semua pengguna aktif)
+                const employeeSnapshot = await getDocs(collection(db, employeeCollectionPath));
+                const userIds = employeeSnapshot.docs.map(doc => doc.id);
+
+                const batch = writeBatch(db);
+                let deletedCount = 0;
+
+                for (const uid of userIds) {
+                    // Hapus data pribadi (Submissions)
+                    const statementDocRef = doc(db, `artifacts/${appId}/users/${uid}/submissions`, uid);
+                    batch.delete(statementDocRef);
+                    
+                    // Hapus data pribadi (Quiz Results)
+                    const quizResultDocRef = doc(db, `artifacts/${appId}/users/${uid}/quiz_results`, uid);
+                    batch.delete(quizResultDocRef);
+                    
+                    // Hapus data publik (Monitoring)
+                    const employeeDocRef = doc(db, employeeCollectionPath, uid);
+                    batch.delete(employeeDocRef);
+                    
+                    // Hapus data publik (Leaderboard)
+                    const leaderboardDocRef = doc(db, leaderboardCollectionPath, uid);
+                    batch.delete(leaderboardDocRef);
+
+                    deletedCount++;
+                }
+
+                // Jalankan batch delete
+                await batch.commit();
+
+                // 2. Reset UI pengguna saat ini
+                resetUIOnLogout();
+                document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
+                
+                // 3. Inisiasi ulang monitoring dan leaderboard
+                setupMonitoring();
+                setupLeaderboard();
+
+                showMessage(`Admin: Berhasil menghapus semua data (${deletedCount} pengguna) dari aplikasi. Aplikasi direset total.`, 'success');
+                
+            } catch (error) {
+                console.error("Error during admin reset: ", error);
+                showMessage(`Admin: Gagal menghapus seluruh data. Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false, 'adminResetAllDataButton');
+            }
+        });
         
-        // Ganti alert() dengan confirm() khusus untuk lingkungan ini
+        // Ganti alert() dengan konfirmasi khusus untuk lingkungan ini
         function confirm(message) {
-            // Dalam lingkungan ini, kita tidak bisa menggunakan window.confirm
-            // Untuk tujuan pengujian, kita menggunakan simulasi prompt sederhana
+            // Menggunakan window.prompt untuk simulasi konfirmasi dalam lingkungan iframe
             console.warn("Menggunakan simulasi konfirmasi. Di aplikasi nyata, gunakan modal custom.");
-            return window.prompt(message + " Ketik 'YA' untuk melanjutkan.") === 'YA';
+            return window.prompt(message + "\n\nKetik 'YA' untuk melanjutkan.") === 'YA';
         }
 
     </script>
