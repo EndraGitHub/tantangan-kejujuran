@@ -1,488 +1,272 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Tantangan Kejujuran : 3 Benar 1 Salah</title>
-    <!-- Load Tailwind CSS -->
+    <title>Sistem Pernyataan Integritas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fb;
-        }
-        /* Custom scrollbar for better appearance */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        .statement-input {
-            transition: all 0.3s ease;
-        }
-        .quiz-option {
-            cursor: pointer;
-            transition: background-color 0.15s, transform 0.15s;
-            transform: scale(1);
-        }
-        .quiz-option:hover {
-            transform: scale(1.01);
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .correct-answer {
-            background-color: #d1fae5; /* green-100 */
-            border-color: #10b981; /* green-500 */
-        }
-        .incorrect-answer {
-            background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
-        }
-        /* Modal Backdrop */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
+        .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .btn-primary { background-color: #4f46e5; color: white; transition: background-color 0.2s; }
+        .btn-primary:hover { background-color: #4338ca; }
+        .btn-secondary { background-color: #e5e7eb; color: #1f2937; transition: background-color 0.2s; }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        .quiz-option { cursor: pointer; transition: transform 0.1s; }
+        .quiz-option:hover { transform: scale(1.02); }
+        .quiz-selected { border-width: 3px; border-color: #4f46e5; background-color: #eef2ff; }
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen">
-
-    <!-- Layar Login Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 z-50 bg-gray-100 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-2xl border text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Selamat Datang</h2>
-            <p class="text-gray-600 mb-8">Aplikasi ini memerlukan autentikasi. Silakan login menggunakan akun Google Anda untuk melanjutkan.</p>
-            <button id="googleLoginButton"
-                class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150">
-                <!-- SVG Ikon Google -->
-                <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
-                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
-                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+<body>
+    <div id="loginOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center z-50 p-4">
+        <div class="card p-8 w-full max-w-lg text-center">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">Sistem Pernyataan Kejujuran</h2>
+            <p class="text-gray-600 mb-6">Aplikasi ini memerlukan login menggunakan akun Google Anda untuk mengidentifikasi dan menyimpan pernyataan integritas pribadi.</p>
+            <button id="googleSignInButton" class="w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center btn-primary text-lg">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.023 12.5a.5.5 0 0 1-.5-.5h-.002a.5.5 0 0 1 .5-.5h.002a.5.5 0 0 1 .5.5a.5.5 0 0 1-.5.5z"/>
+                    <path fill-rule="evenodd" d="M15.36 12.435c0 1.25-.39 2.19-1.03 2.85c-.64.66-1.55 1.01-2.73 1.01c-.91 0-1.74-.3-2.5-.9c-.76-.6-1.28-1.42-1.56-2.48h1.27c.22.68.62 1.22 1.18 1.62c.57.4 1.22.6 1.95.6c.92 0 1.64-.32 2.16-.96c.52-.64.78-1.5.78-2.58c0-.98-.24-1.78-.72-2.38c-.48-.6-.88-.9-1.4-.9c-.66 0-1.16.22-1.5.66c-.34.44-.5.88-.5 1.32h-1.3c0-1.04.38-1.92 1.14-2.64c.76-.72 1.77-1.08 3.03-1.08c1.18 0 2.09.35 2.73 1.01c.64.66 1.03 1.6 1.03 2.85zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8z"/>
                 </svg>
-                Login dengan Google
+                Masuk dengan Google
             </button>
-            <p id="loginStatus" class="mt-4 text-sm text-gray-500 hidden">Menghubungkan ke Google...</p>
         </div>
     </div>
 
-    <!-- DIHAPUS: Modal Manajemen Data Pegawai (CRUD) tidak lagi diperlukan -->
-    
-    <!-- Loading Indicator UI -->
-    <div id="loadingIndicator" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl flex items-center">
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Memuat...
-        </div>
-    </div>
-
-    <!-- Message Box UI -->
-    <div id="messageBox" class="fixed top-0 left-1/2 -translate-x-1/2 mt-4 p-4 text-sm font-medium rounded-lg shadow-lg z-50 transition-all duration-300 ease-out transform scale-0 opacity-0" role="alert">
-        <!-- Message content will be inserted here -->
-    </div>
-    
-    <!-- Confirmation Dialog (Custom Alert/Confirm) -->
-    <div id="confirmationDialog" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Konfirmasi</h3>
-            <p id="confirmationMessage" class="text-gray-700 mb-6">Apakah Anda yakin?</p>
-            <div class="flex justify-end space-x-3">
-                <button id="confirmCancel" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition">Batal</button>
-                <button id="confirmAction" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">Hapus</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Konten Aplikasi Utama (awalnya disembunyikan) -->
-    <div id="mainAppContainer" class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100 hidden">
-
-        <header class="mb-8 border-b pb-4">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900">Aplikasi Tantangan Kejujuran : 3 Benar 1 Salah</h1>
-                    <p class="mt-2 text-gray-600">Modul untuk menginput set empat (4) pernyataan diri: tiga (3) Benar dan satu (1) Salah, sebagai bagian dari Self-Assessment Kebenaran Diri. </p>
-                    <!-- Info user & tombol logout -->
-                    <p id="welcomeMessage" class="mt-2 text-sm text-gray-500"></p>
-                </div>
-                <button id="logoutButton"
-                    class="ml-4 flex-shrink-0 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-700 transition">
-                    Logout
-                </button>
-            </div>
-        </header>
-
-        <!-- DIHAPUS: Langkah 1: Validasi Pegawai tidak lagi diperlukan -->
-
-        <!-- Langkah 2: Input Pernyataan (Sekarang jadi Langkah 1) -->
-        <!-- PERUBAHAN: Dibuat aktif secara default saat login -->
-        <section id="step2" class="opacity-50 pointer-events-none">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 1: Input Pernyataan Tentang Diri Anda</h2>
-            <p class="text-gray-700 mb-6 border-b pb-4">
-                Inputkan empat (4) pernyataan di bawah ini. Komposisi wajib: **3 Pernyataan Benar** dan **1 Pernyataan Salah** tentang diri Anda sendiri.
-            </p>
-
-            <div id="statementsContainer" class="space-y-6">
-                <!-- Statement 1 (BENAR) -->
-                <div class="flex flex-col md:flex-row gap-4 statement-item" data-status="Benar">
-                    <div class="flex-1">
-                        <label for="stmt1" class="block text-sm font-medium text-gray-700 mb-1">1. Pernyataan Anda</label>
-                        <textarea id="stmt1" rows="3" placeholder="Contoh: Saya menguasai Microsoft Excel."
-                            class="statement-input w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-                            required></textarea>
-                    </div>
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Kebenaran</label>
-                        <span class="block w-full p-3 bg-green-100 text-green-700 font-semibold rounded-lg text-center border border-green-300">
-                            Pernyataan Benar (Otomatis)
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Statement 2 (BENAR) -->
-                <div class="flex flex-col md:flex-row gap-4 statement-item" data-status="Benar">
-                    <div class="flex-1">
-                        <label for="stmt2" class="block text-sm font-medium text-gray-700 mb-1">2. Pernyataan Anda</label>
-                        <textarea id="stmt2" rows="3" placeholder="Contoh: Saya pernah bertugas di luar pulau Jawa."
-                            class="statement-input w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-                            required></textarea>
-                    </div>
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Kebenaran</label>
-                        <span class="block w-full p-3 bg-green-100 text-green-700 font-semibold rounded-lg text-center border border-green-300">
-                            Pernyataan Benar (Otomatis)
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Statement 3 (BENAR) -->
-                <div class="flex flex-col md:flex-row gap-4 statement-item" data-status="Benar">
-                    <div class="flex-1">
-                        <label for="stmt3" class="block text-sm font-medium text-gray-700 mb-1">3. Pernyataan Anda</label>
-                        <textarea id="stmt3" rows="3" placeholder="Contoh: Saya lulusan S2."
-                            class="statement-input w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-                            required></textarea>
-                    </div>
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Kebenaran</label>
-                        <span class="block w-full p-3 bg-green-100 text-green-700 font-semibold rounded-lg text-center border border-green-300">
-                            Pernyataan Benar (Otomatis)
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Statement 4 (SALAH) -->
-                <div class="flex flex-col md:flex-row gap-4 statement-item" data-status="Salah">
-                    <div class="flex-1">
-                        <label for="stmt4" class="block text-sm font-medium text-gray-700 mb-1">4. Pernyataan Anda</label>
-                        <textarea id="stmt4" rows="3" placeholder="Contoh: Saya bisa berbicara bahasa Jepang (jika Anda tidak bisa)."
-                            class="statement-input w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
-                            required></textarea>
-                    </div>
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Kebenaran</label>
-                        <span class="block w-full p-3 bg-red-100 text-red-700 font-semibold rounded-lg text-center border border-red-300">
-                            Pernyataan Salah (Otomatis)
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t flex justify-end">
-                <button id="submitButton"
-                    class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    Simpan Data Pernyataan
-                </button>
-            </div>
-        </section>
-
-        <!-- Langkah 3: Monitoring Status Pengisian (Sekarang jadi Langkah 2) -->
-        <section id="step3" class="mt-10 pt-6 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 2: Monitoring Status Pengisian</h2>
-            <p class="text-gray-600 mb-4">Daftar di bawah menunjukkan status pengisian pernyataan (3 Benar 1 Salah) oleh seluruh pengguna Google yang telah login. Status diperbarui secara *real-time*.</p>
+    <div id="mainAppContainer" class="hidden min-h-screen p-4 md:p-8">
+        <div class="max-w-4xl mx-auto">
             
-            <div id="monitoringContainer" class="bg-white rounded-lg shadow overflow-x-auto border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pengguna (Google)</th>
-                            <!-- DIHAPUS: Kolom Username -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Pengisian</th>
-                        </tr>
-                    </thead>
-                    <tbody id="monitoringTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Monitoring rows will be injected here -->
-                        <tr><td colspan="3" class="text-center py-4 text-gray-500">Memuat status pengisian...</td></tr>
-                    </tbody>
-                </table>
-                <div class="p-4 text-sm text-gray-600 border-t flex justify-between">
-                    <!-- DIHAPUS: Total Pegawai -->
-                    <span>Total Telah Mengisi: <span id="submittedCount" class="font-semibold text-green-600">0</span></span>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Langkah 4: Tantangan Kejujuran (Kuis) (Sekarang jadi Langkah 3) -->
-        <section id="step4" class="mt-10 pt-6 border-t border-gray-200 opacity-50 pointer-events-none transition-opacity duration-500">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Langkah 3: Tantangan Kejujuran (Kuis)</h2>
-                <div class="flex items-center space-x-4">
-                    <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-bold shadow-sm">
-                        PROGRES: <span id="quizProgressDisplay">0/0</span>
-                    </div>
-                    <div class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-lg font-bold shadow-sm">
-                        SKOR ANDA: <span id="userScoreDisplay">0</span> Poin
-                    </div>
-                </div>
-            </div>
-            
-            <div id="quizArea" class="p-6 bg-gray-50 rounded-xl shadow-inner min-h-[250px] flex flex-col justify-center items-center">
-                <!-- Status/Prompt Message -->
-                <p id="quizStatus" class="text-lg text-gray-600 mb-6">❌ Akses diblokir. Harap selesaikan Langkah 1 (Input Pernyataan) untuk membuka kuis.</p>
-
-                <!-- NEW START BUTTON -->
-                <button id="startQuizButton"
-                    class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
-                    Mulai Tantangan Kejujuran
-                </button>
-                
-                <div id="quizContent" class="w-full hidden mt-4">
-                    <!-- Timer Display -->
-                    <div class="mb-6 p-4 bg-white rounded-lg border border-indigo-200 shadow-md">
-                        <div class="flex justify-between items-start">
-                            <!-- Question Title -->
-                            <div>
-                                <p class="text-sm font-medium text-indigo-700">PERTANYAAN:</p>
-                                <p class="text-xl font-semibold text-gray-800 mt-1">
-                                    Pilih SATU pernyataan yang PALING SALAH mengenai Pengguna: <span id="quizEmployeeName" class="text-indigo-600"></span>
-                                </p>
-                            </div>
-                            <!-- Per-Question Timer -->
-                            <div class="text-right flex-shrink-0 ml-4">
-                                <p class="text-sm font-medium text-gray-500">Waktu:</p>
-                                <p id="questionTimerDisplay" class="text-2xl font-bold text-red-600">00:00</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="quizOptionsContainer" class="space-y-3">
-                        <!-- Options injected here -->
-                    </div>
-                    
-                    <div id="quizFeedback" class="mt-4 p-3 rounded-lg font-semibold text-center hidden"></div>
-                    
-                    <button id="nextQuizButton" class="mt-6 w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 hidden">
-                        Lanjut ke Pertanyaan Berikutnya
+            <!-- Header dan Pengguna -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 card bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2 md:mb-0">Aplikasi Integritas Pegawai</h1>
+                <div class="text-right flex items-center space-x-4">
+                    <p id="welcomeMessage" class="text-sm font-medium text-gray-600"></p>
+                    <button id="resetDataButton" class="text-xs font-medium text-red-600 hover:text-red-800 px-3 py-1 rounded-full border border-red-300 transition duration-150 btn-secondary">
+                        Hapus & Reset Data Saya
                     </button>
+                    <button id="signOutButton" class="text-sm font-semibold py-1 px-3 rounded-xl btn-secondary">Keluar</button>
                 </div>
             </div>
-        </section>
-        
-        <!-- Langkah 5: Papan Skor Pegawai (Leaderboard) (Sekarang jadi Langkah 4) -->
-        <section id="step5" class="mt-10 pt-6 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Langkah 4: Papan Skor Pengguna (Leaderboard)</h2>
-            <p class="text-gray-600 mb-4">Akumulasi skor yang didapatkan setiap pengguna dalam Tantangan Kejujuran (diurutkan berdasarkan skor tertinggi).</p>
+
+            <!-- Area Notifikasi -->
+            <div id="messageBox" class="mb-6 p-3 rounded-xl hidden text-sm font-medium" role="alert"></div>
             
-            <div id="leaderboardContainer" class="bg-white rounded-lg shadow overflow-x-auto border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Pengguna (Quiz Taker)</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Skor</th>
-                            <!-- Added Time Column -->
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Waktu</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Updated Colspan -->
-                        <tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat Papan Skor...</td></tr>
-                    </tbody>
-                </table>
+            <!-- Langkah 1: Input Pernyataan -->
+            <div id="step2" class="card p-6 mb-8 transition-opacity duration-300">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Langkah 1: Input Pernyataan Tentang Diri Anda</h2>
+                <p class="text-gray-600 mb-4 text-sm">Berikan 3 (tiga) pernyataan yang BENAR tentang diri Anda, dan 1 (satu) pernyataan yang SALAH. Pastikan pernyataan salah tersebut sangat meyakinkan.</p>
+                
+                <div id="statementForm">
+                    <h3 class="font-medium text-indigo-600 mb-2">3 Pernyataan Benar (Wajib)</h3>
+                    <textarea id="true1" class="w-full p-3 mb-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" rows="2" placeholder="Pernyataan Benar 1"></textarea>
+                    <textarea id="true2" class="w-full p-3 mb-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" rows="2" placeholder="Pernyataan Benar 2"></textarea>
+                    <textarea id="true3" class="w-full p-3 mb-5 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" rows="2" placeholder="Pernyataan Benar 3"></textarea>
+                    
+                    <h3 class="font-medium text-red-600 mb-2">1 Pernyataan Salah (Wajib)</h3>
+                    <textarea id="false1" class="w-full p-3 mb-5 border rounded-lg focus:ring-red-500 focus:border-red-500" rows="2" placeholder="Pernyataan Salah (Ini adalah tes kejujuran Anda!)"></textarea>
+
+                    <button id="submitButton" class="w-full py-3 rounded-xl font-semibold btn-primary">Simpan Data Pernyataan</button>
+                </div>
             </div>
-        </section>
 
+            <!-- Langkah 2: Monitoring Status Pengisian -->
+            <div id="step3" class="card p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Langkah 2: Monitoring Status Pengisian</h2>
+                <div id="monitoringTableContainer" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status Pernyataan</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Submit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monitoringTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data Karyawan akan di-inject di sini -->
+                            <tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Langkah 3: Tes Kejujuran (Kuis) -->
+            <div id="step4" class="card p-6 mb-8 opacity-50 pointer-events-none transition-opacity duration-300">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Langkah 3: Tes Kejujuran (Kuis)</h2>
+                
+                <div id="quizProgress" class="mb-4">
+                    <p class="text-sm font-medium text-gray-700 mb-1">Progres Kuis: <span id="quizProgressText">0/10</span></p>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="quizProgressBar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="quizArea" class="space-y-6">
+                    <!-- Soal Kuis akan di-inject di sini -->
+                    <p class="text-gray-500 text-center py-8">Lengkapi Langkah 1 untuk memulai kuis.</p>
+                </div>
+
+                <button id="submitQuizButton" class="w-full py-3 rounded-xl font-semibold btn-primary mt-6 hidden">Kirim Jawaban Kuis</button>
+                <div id="quizResult" class="mt-6 p-4 rounded-xl bg-green-100 text-green-800 font-semibold hidden"></div>
+            </div>
+
+            <!-- Langkah 4: Leaderboard -->
+            <div id="step5" class="card p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Langkah 4: Leaderboard Nilai Kejujuran</h2>
+                <div id="leaderboardContainer" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Skor Kuis</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Skor Total (Simulasi)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data Leaderboard akan di-inject di sini -->
+                            <tr><td colspan="4" class="text-center py-4 text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
     </div>
-
-    <!-- Firebase SDKs -->
+    
+    <!-- Modals dan Scripts -->
     <script type="module">
-        // PERUBAHAN: Menambahkan impor untuk Google Auth
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, query, onSnapshot, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            onSnapshot, 
+            collection, 
+            query, 
+            getDocs, 
+            deleteDoc,
+            updateDoc,
+            arrayUnion 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
-        // --- KONFIGURASI FIREBASE (WAJIB DIISI) ---
-        // PENTING: Jika Anda menjalankan di Tiiny Host/Lingkungan Eksternal, 
-        // pastikan Anda mengganti nilai di bawah ini dengan konfigurasi Firebase ASLI Anda.
-        const firebaseConfig = {
-            apiKey: "AIzaSyABv2USzWH2QA3QNKiJmvCjI2N-IwYkUcM", // GANTI INI
-            authDomain: "tantangan.firebaseapp.com", // GANTI INI
-            projectId: "tantangan", // GANTI INI
-            storageBucket: "tantangan.firebasestorage.app", // GANTI INI
-            messagingSenderId: "13124408127", // GANTI INI
-            appId: "1:13124408127:web:72db9cfe8a1ba3c3c6f98a", // GANTI INI
-            measurementId: "G-7V0MQZ4KDL"
-        };
+        // setLogLevel('Debug'); // Aktifkan untuk debugging
 
-        // --- GANTI NAMA APLIKASI INI (WAJIB DIISI) ---
-        const appId = 'Tantangan Kejujuran';
+        // Global Variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
-        // --- END OF CONFIGURATION ---
-
-
-        let db;
-        let auth;
-        // PERUBAHAN: userId akan diisi oleh onAuthStateChanged
-        let userId = null; 
-        // DIHAPUS: employeeDisplayName, allEmployees, selectedEmployee
-        let allSubmissions = [];
-        let quizzesTakenIds = new Set(); 
-        let currentQuizData = null; 
-        let currentScore = 0; 
-        let totalEligibleQuestions = 0; 
+        let app, db, auth;
+        let userId = null;
+        let statementsData = [];
+        let monitoringUnsubscribe = null;
+        let quizUnsubscribe = null;
+        let leaderboardUnsubscribe = null;
         
-        // Timer Variables
-        let questionTimerInterval = null;
-        let questionStartTime = 0;
-        let currentQuestionTimeElapsed = 0; // in seconds
-        let totalAccumulatedTime = 0; // in seconds
-        
-        // Firestore Collection Paths
-        // Menggunakan variabel global __app_id jika tersedia (untuk lingkungan Canvas)
-        const effectiveAppId = typeof __app_id !== 'undefined' ? __app_id : appId;
-        // DIHAPUS: employeeCollectionPath, userMapCollectionPath
-        const submissionCollectionPath = `/artifacts/${effectiveAppId}/public/data/employee_submissions`;
-        const leaderboardCollectionPath = `/artifacts/${effectiveAppId}/public/data/quiz_leaderboard`;
+        const submissionCollectionPath = `artifacts/${appId}/users/${userId || 'placeholder'}/submissions`;
+        const quizCollectionPath = `artifacts/${appId}/public/data/quiz_questions`;
+        const employeeCollectionPath = `artifacts/${appId}/public/data/employee_monitoring`;
+        const leaderboardCollectionPath = `artifacts/${appId}/public/data/leaderboard`;
 
-        // DIHAPUS: initialMockEmployees
-
-        // --- UI UTILITIES (Confim Dialog) ---
-        
-        let confirmResolver;
-        const confirmationDialog = document.getElementById('confirmationDialog');
-        const confirmationMessage = document.getElementById('confirmationMessage');
-        const confirmCancel = document.getElementById('confirmCancel');
-        const confirmAction = document.getElementById('confirmAction');
-
-        function showConfirmation(message, actionText = 'Lanjutkan', actionClass = 'bg-red-600 hover:bg-red-700') {
-            confirmationMessage.textContent = message;
-            confirmAction.textContent = actionText;
-            confirmAction.className = `px-4 py-2 text-white font-semibold rounded-lg transition ${actionClass}`;
-            
-            confirmationDialog.classList.remove('hidden');
-
-            return new Promise(resolve => {
-                confirmResolver = resolve;
-            });
-        }
-
-        function closeConfirmation() {
-            confirmationDialog.classList.add('hidden');
-        }
-
-        confirmCancel.addEventListener('click', () => {
-            closeConfirmation();
-            if (confirmResolver) confirmResolver(false);
-        });
-
-        confirmAction.addEventListener('click', () => {
-            closeConfirmation();
-            if (confirmResolver) confirmResolver(true);
-        });
-
-
-        // --- UI UTILITIES (Message, Loading, and Time Formatters) ---
-        function showMessage(message, type = 'success') {
+        // Utility Functions
+        function showMessage(text, type = 'info') {
             const box = document.getElementById('messageBox');
-            box.textContent = message;
+            box.textContent = text;
+            box.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
             
-            box.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'text-white', 'scale-0', 'opacity-0');
-            box.classList.add('scale-100', 'opacity-100');
-
-            if (type === 'success') {
-                box.classList.add('bg-green-500', 'text-white');
-            } else if (type === 'error') {
-                box.classList.add('bg-red-500', 'text-white');
-            } else {
-                box.classList.add('bg-yellow-500', 'text-white');
+            switch (type) {
+                case 'success':
+                    box.classList.add('bg-green-100', 'text-green-800');
+                    break;
+                case 'error':
+                    box.classList.add('bg-red-100', 'text-red-800');
+                    break;
+                case 'info':
+                default:
+                    box.classList.add('bg-blue-100', 'text-blue-800');
+                    break;
             }
-
-            // Make error messages stay on screen longer
-            const aTimeout = (type === 'error') ? 8000 : 4000; // 8 seconds for errors, 4 for others
-
-            setTimeout(() => {
-                box.classList.remove('scale-100', 'opacity-100');
-                box.classList.add('scale-0', 'opacity-0');
-            }, aTimeout);
+            box.classList.remove('hidden');
         }
 
-        function showLoading(show) {
-            document.getElementById('loadingIndicator').classList.toggle('hidden', !show);
-            document.getElementById('submitButton').disabled = show;
+        function showLoading(isLoading) {
+            const btn = document.getElementById('submitButton');
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Memproses...
+                `;
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Simpan Data Pernyataan';
+            }
         }
 
-        function updateQuizProgressDisplay() {
-            const answeredCount = quizzesTakenIds.size;
-            document.getElementById('quizProgressDisplay').textContent = `${answeredCount}/${totalEligibleQuestions}`;
+        // --- FIREBASE INITIALIZATION & AUTH ---
+
+        if (firebaseConfig) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            initializeFirebase();
+        } else {
+            console.error("Firebase config is missing.");
+            document.getElementById('loginOverlay').innerHTML = '<p class="text-red-500">Kesalahan: Konfigurasi Firebase tidak tersedia.</p>';
+        }
+
+        async function handleGoogleSignIn() {
+            const provider = new GoogleAuthProvider();
+            try {
+                // Tambahkan 'prompt: select_account' agar pengguna selalu bisa memilih akun
+                provider.setCustomParameters({ prompt: 'select_account' });
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Error signing in with Google: ", error);
+                showMessage("Gagal melakukan login Google.", 'error');
+            }
         }
         
-        // Time Formatting Utilities
-        
-        /** Formats total seconds into MM:SS format */
-        function formatTime(totalSeconds) {
-            if (totalSeconds === undefined || totalSeconds === null) totalSeconds = 0;
-            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-            const seconds = String(totalSeconds % 60).padStart(2, '0');
-            return `${minutes}:${seconds}`;
-        }
-        
-        /** Formats total seconds into readable string "X menit Y detik" */
-        function formatTimeReadable(totalSeconds) {
-            if (totalSeconds === undefined || totalSeconds === null) totalSeconds = 0;
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
-            let parts = [];
-            if (minutes > 0) parts.push(`${minutes} menit`);
-            if (seconds > 0 || minutes === 0) parts.push(`${seconds} detik`);
-            return parts.join(' ');
-        }
-        
-        // DIHAPUS: Modal (Manajemen Pegawai) LOGIC
-
-        // --- FIREBASE INITIALIZATION AND AUTHENTICATION (PERUBAHAN BESAR) ---
         async function initializeFirebase() {
             try {
-                // Determine which configuration to use
-                const effectiveFirebaseConfig = typeof __firebase_config !== 'undefined' 
-                                            ? JSON.parse(__firebase_config) 
-                                            : firebaseConfig;
-                
-                if (effectiveFirebaseConfig.apiKey === "AIzaSyABv2USzWH2QA3QNKiJmvCjI2N-IwYkUcM" && typeof __firebase_config === 'undefined') {
-                    showMessage("Peringatan: Konfigurasi Firebase Anda belum diganti. Login Google mungkin gagal.", "warning");
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
                 }
 
-                const app = initializeApp(effectiveFirebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                // PERUBAHAN: Menggunakan onAuthStateChanged sebagai gerbang utama aplikasi
                 onAuthStateChanged(auth, async (user) => {
                     const loginOverlay = document.getElementById('loginOverlay');
                     const mainAppContainer = document.getElementById('mainAppContainer');
-                    
-                    if (user) {
+                    const googleSignInButton = document.getElementById('googleSignInButton');
+
+                    if (user && user.isAnonymous) {
+                        // --- PENGGUNA ANONIM ---
+                        loginOverlay.classList.remove('hidden');
+                        mainAppContainer.classList.add('hidden');
+                        googleSignInButton.addEventListener('click', handleGoogleSignIn);
+                        showMessage("Anda harus login Google untuk menggunakan fitur ini.", 'info');
+                    } else if (user) {
                         // --- PENGGUNA LOGIN ---
                         userId = user.uid;
                         
                         document.getElementById('welcomeMessage').textContent = `Login sebagai: ${user.displayName} (${user.email})`;
                         
-                        // Sembunyikan overlay dan tampilkan aplikasi
                         loginOverlay.classList.add('hidden');
                         mainAppContainer.classList.remove('hidden');
                         
@@ -491,154 +275,118 @@
                         // PERBAIKAN: Langsung aktifkan form input (Langkah 1) setelah login berhasil
                         document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
                         
-                        // Mulai memuat data setelah login berhasil
-                        // DIHAPUS: setupEmployeeDataListener();
                         setupMonitoring();
                         setupLeaderboard();
                         
-                        // PERUBAHAN: Langsung cek status submisi user ini
-                        // Fungsi ini sekarang HANYA akan mengisi/menonaktifkan jika data ada
                         checkUserSubmissionStatus();
                         setupQuizProgressMonitoring(); 
 
                     } else {
-                        // --- PENGGUNA LOGOUT ---
-                        userId = null;
-                        
-                        // Tampilkan overlay dan sembunyikan aplikasi
+                        // Jika tidak ada user (setelah sign out), kembali ke layar login
                         loginOverlay.classList.remove('hidden');
                         mainAppContainer.classList.add('hidden');
-                        document.getElementById('loginStatus').classList.add('hidden');
-                        document.getElementById('googleLoginButton').disabled = false;
-                        
-                        // Reset UI
                         resetUIOnLogout();
                     }
                 });
 
             } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                showMessage(`Gagal inisialisasi Firebase. Error: ${error.message}`, "error");
+                console.error("Error during initial auth or setup: ", error);
+                showMessage("Kesalahan saat otentikasi awal.", 'error');
             }
         }
         
         function resetUIOnLogout() {
-            // Mereset state aplikasi saat logout
-            // DIHAPUS: Logika reset Step 1 (validasi)
+            document.getElementById('welcomeMessage').textContent = 'Belum Login';
+            document.getElementById('messageBox').classList.add('hidden');
             
-            document.getElementById('step2').classList.add('opacity-50', 'pointer-events-none');
-            document.querySelectorAll('#step2 textarea').forEach(ta => {
-                ta.disabled = false;
-                ta.value = '';
-            });
+            // Reset Langkah 1
+            document.querySelectorAll('#step2 textarea').forEach(ta => { ta.value = ''; ta.disabled = false; });
             document.getElementById('submitButton').disabled = false;
             document.getElementById('submitButton').textContent = 'Simpan Data Pernyataan';
+            document.getElementById('step2').classList.add('opacity-50', 'pointer-events-none');
             
+            // Nonaktifkan Langkah 3 (Kuis)
             document.getElementById('step4').classList.add('opacity-50', 'pointer-events-none');
             // Reset state kuis
-            currentScore = 0;
-            quizzesTakenIds = new Set();
-            totalAccumulatedTime = 0;
-            document.getElementById('userScoreDisplay').textContent = '0';
-            document.getElementById('quizArea').innerHTML = `
-                <p id="quizStatus" class="text-lg text-gray-600 mb-6">❌ Akses diblokir. Silakan login dan selesaikan Langkah 1 untuk membuka kuis.</p>
-                <button id="startQuizButton" class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
-                    Mulai Tantangan Kejujuran
-                </button>
-                <div id="quizContent" class="w-full hidden mt-4">
-                    <!-- ... (Struktur HTML kuis dikembalikan) ... -->
-                </div>
-            `;
-            // Re-attach listener ke tombol start (karena innerHTML menghapusnya)
-            document.getElementById('startQuizButton').addEventListener('click', () => {
-                 document.getElementById('quizStatus').classList.add('hidden');
-                 document.getElementById('startQuizButton').classList.add('hidden');
-                 document.getElementById('quizContent').classList.remove('hidden');
-                 startQuiz();
-            });
-        }
-        
-        // PERUBAHAN: Listener untuk tombol Login dan Logout
-        document.getElementById('googleLoginButton').addEventListener('click', async () => {
-            document.getElementById('loginStatus').classList.remove('hidden');
-            document.getElementById('googleLoginButton').disabled = true;
-            
-            const provider = new GoogleAuthProvider();
-            try {
-                // signInWithPopup akan memicu onAuthStateChanged
-                await signInWithPopup(auth, provider);
-                // onAuthStateChanged akan menangani sisanya
-            } catch (error) {
-                console.error("Google Sign-In failed:", error);
-                showMessage(`Login Google Gagal. Error: ${error.message}`, "error");
-                document.getElementById('loginStatus').classList.add('hidden');
-                document.getElementById('googleLoginButton').disabled = false;
-            }
-        });
+            document.getElementById('quizProgressText').textContent = '0/10';
+            document.getElementById('quizProgressBar').style.width = '0%';
+            document.getElementById('quizArea').innerHTML = '<p class="text-gray-500 text-center py-8">Lengkapi Langkah 1 untuk memulai kuis.</p>';
+            document.getElementById('submitQuizButton').classList.add('hidden');
+            document.getElementById('quizResult').classList.add('hidden');
 
-        document.getElementById('logoutButton').addEventListener('click', async () => {
+            // Hentikan listener
+            if (monitoringUnsubscribe) monitoringUnsubscribe();
+            if (quizUnsubscribe) quizUnsubscribe();
+            if (leaderboardUnsubscribe) leaderboardUnsubscribe();
+            monitoringUnsubscribe = null;
+            quizUnsubscribe = null;
+            leaderboardUnsubscribe = null;
+        }
+
+        document.getElementById('signOutButton').addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // onAuthStateChanged akan menangani sisanya
-                showMessage("Anda berhasil logout.", "success");
+                showMessage("Anda telah berhasil keluar.", 'info');
             } catch (error) {
-                console.error("Logout failed:", error);
-                showMessage(`Gagal logout. Error: ${error.message}`, "error");
+                console.error("Error signing out: ", error);
+                showMessage("Gagal keluar.", 'error');
             }
         });
-
-
-        // DIHAPUS: EMPLOYEE CRUD OPERATIONS
-        // DIHAPUS: CORE APPLICATION LOGIC (Validasi Step 1)
 
         // --- CORE APPLICATION LOGIC ---
 
-        // Step 1 (Dulu Step 2): Submit Statements
+        // Step 1: Submit Statements
         document.getElementById('submitButton').addEventListener('click', async () => {
-            // PERUBAHAN: Cek userId, bukan selectedEmployee
             if (!userId) {
-                showMessage("Harap login terlebih dahulu.", "error");
+                showMessage("Anda harus login Google untuk menyimpan data.", 'error');
                 return;
             }
 
-            const statements = [];
-            const statementElements = document.querySelectorAll('.statement-item');
-            let allFilled = true;
+            const true1 = document.getElementById('true1').value.trim();
+            const true2 = document.getElementById('true2').value.trim();
+            const true3 = document.getElementById('true3').value.trim();
+            const false1 = document.getElementById('false1').value.trim();
 
-            statementElements.forEach(item => {
-                const textarea = item.querySelector('textarea');
-                const text = textarea.value.trim();
-                if (!text) {
-                    allFilled = false;
-                }
-                statements.push({
-                    text: text,
-                    status: item.dataset.status
-                });
-            });
-
-            if (!allFilled) {
-                showMessage("Semua empat pernyataan wajib diisi.", "error");
+            if (!true1 || !true2 || !true3 || !false1) {
+                showMessage("Semua 4 pernyataan wajib diisi.", 'error');
                 return;
             }
-            
-            const confirmed = await showConfirmation(`Anda akan menyimpan pernyataan untuk ${auth.currentUser.displayName}. Apakah Anda yakin?`, 'Simpan', 'bg-indigo-600 hover:bg-indigo-700');
-            if(!confirmed) return;
+
+            const statements = [
+                { text: true1, status: 'Benar' },
+                { text: true2, status: 'Benar' },
+                { text: true3, status: 'Benar' },
+                { text: false1, status: 'Salah' }
+            ];
+
+            // Acak pernyataan untuk Kuis
+            statementsData = statements.sort(() => Math.random() - 0.5);
 
             showLoading(true);
 
             try {
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/submissions`, userId);
+
                 // PERBAIKAN: Tambahkan fallback untuk displayName dan email
                 const submissionData = {
                     googleName: auth.currentUser.displayName || 'Pengguna Tanpa Nama',
                     googleEmail: auth.currentUser.email || 'email-tidak-diketahui',
-                    statements: statements,
+                    statements: statementsData,
                     submittedAt: new Date()
                 };
 
-                // PERUBAHAN: Dokumen di-set menggunakan userId
-                const docRef = doc(db, submissionCollectionPath, userId);
                 await setDoc(docRef, submissionData);
+                
+                // Tambahkan/Update data ke tabel monitoring publik
+                const employeeDocRef = doc(db, employeeCollectionPath, userId);
+                await setDoc(employeeDocRef, {
+                    userId: userId,
+                    name: auth.currentUser.displayName || 'Pengguna Tanpa Nama',
+                    email: auth.currentUser.email || 'email-tidak-diketahui',
+                    hasSubmitted: true,
+                    submissionTime: new Date()
+                }, { merge: true });
+
 
                 showMessage("Pernyataan Anda berhasil disimpan!", "success");
                 document.getElementById('submitButton').disabled = true;
@@ -651,28 +399,23 @@
 
             } catch (error) {
                 console.error("Error submitting statements: ", error);
-                showMessage(`Gagal menyimpan pernyataan. Error: ${error.message}`, "error");
+                showMessage(`Gagal menyimpan pernyataan: ${error.message}`, 'error');
             } finally {
-                showLoading(false);
+                showLoading(false); // Pastikan loading berhenti
             }
         });
 
         async function checkUserSubmissionStatus() {
-            // PERUBAHAN: Cek userId
             if (!userId || !db) return;
             
             try {
-                // PERUBAHAN: Ambil dokumen berdasarkan userId
-                const docRef = doc(db, submissionCollectionPath, userId);
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/submissions`, userId);
                 const docSnap = await getDoc(docRef);
-
-                // PERBAIKAN: Hapus 'else' block. Section sudah diaktifkan oleh onAuthStateChanged.
-                // Fungsi ini sekarang hanya bertanggung jawab untuk MENGISI dan MENONAKTIFKAN
-                // jika data SUDAH ADA.
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const textareas = document.querySelectorAll('#step2 textarea');
+                    statementsData = data.statements; // Muat pernyataan yang sudah tersimpan
                     
                     const trueStatements = data.statements.filter(s => s.status === 'Benar');
                     const falseStatement = data.statements.find(s => s.status === 'Salah');
@@ -687,341 +430,348 @@
                     document.getElementById('submitButton').textContent = 'Data Sudah Tersimpan';
                     showMessage("Anda sudah mengisi pernyataan. Anda dapat memulai kuis.", 'info');
                     
-                    // PERBAIKAN: Hapus pemanggilan 'classList.remove' dari sini, karena sudah dipindah
                     unlockQuizSection();
-                } 
-                // 'else' block (untuk user baru) tidak lagi diperlukan,
-                // karena section sudah diaktifkan dan form-nya kosong/aktif by default.
+                } else {
+                    // User baru, pastikan form diaktifkan dan kosong (sudah dilakukan di onAuthStateChanged)
+                    document.querySelectorAll('#step2 textarea').forEach(ta => { ta.value = ''; ta.disabled = false; });
+                    document.getElementById('submitButton').disabled = false;
+                    document.getElementById('submitButton').textContent = 'Simpan Data Pernyataan';
+                }
 
             } catch (error) {
                  console.error("Error checking submission status: ", error);
-                 showMessage(`Gagal memeriksa status (Error: ${error.message}).`, "error");
             }
         }
-        
-        // Step 2 (Dulu Step 3): Monitoring
-        function setupMonitoring() {
-            if (!db) return;
-            const q = query(collection(db, submissionCollectionPath));
-            
-            onSnapshot(q, (snapshot) => {
-                const submissions = [];
-                snapshot.forEach((doc) => {
-                    // PERUBAHAN: Simpan userId (doc.id)
-                    submissions.push({ userId: doc.id, ...doc.data() });
-                });
-                allSubmissions = submissions;
-                // PERUBAHAN: Kirim 'submissions' bukan 'allEmployees'
-                renderMonitoringTable(allSubmissions);
-                
-                // PERUBAHAN: Filter berdasarkan userId
-                totalEligibleQuestions = allSubmissions.filter(sub => sub.userId !== userId).length;
-                updateQuizProgressDisplay();
-            }, (error) => {
-                console.error("Error listening to submissions: ", error);
-                showMessage(`Gagal memuat data monitoring (Error: ${error.message}).`, "error");
-            });
-        }
-        
-        // PERUBAHAN: Parameter diubah ke 'submissions'
-        function renderMonitoringTable(submissions) {
-            const tableBody = document.getElementById('monitoringTableBody');
-            
-            if (submissions.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada data submisi.</td></tr>';
-                return;
-            }
 
-            // PERUBAHAN: Iterasi 'submissions' dan tampilkan data Google
-            tableBody.innerHTML = submissions.map((sub, index) => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${sub.googleName || 'User Tanpa Nama'} <span class="text-gray-400">(${sub.googleEmail})</span></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sudah Mengisi</span>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // PERUBAHAN: Update hitungan
-            document.getElementById('submittedCount').textContent = submissions.length;
-        }
-
-        // --- QUIZ LOGIC (Step 3) ---
-
-        // Timer Control Functions
-        function startQuestionTimer() {
-            stopQuestionTimer(); 
-            
-            const timerDisplay = document.getElementById('questionTimerDisplay');
-            if (timerDisplay) timerDisplay.textContent = '00:00';
-            
-            questionStartTime = Date.now();
-            currentQuestionTimeElapsed = 0;
-
-            questionTimerInterval = setInterval(() => {
-                currentQuestionTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-                if (timerDisplay) {
-                    timerDisplay.textContent = formatTime(currentQuestionTimeElapsed);
-                }
-            }, 1000);
-        }
-
-        function stopQuestionTimer() {
-            if (questionTimerInterval) {
-                clearInterval(questionTimerInterval);
-                questionTimerInterval = null;
-            }
-            if (questionStartTime > 0) {
-                 currentQuestionTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-            }
-        }
-        
         function unlockQuizSection() {
             document.getElementById('step4').classList.remove('opacity-50', 'pointer-events-none');
-            const quizStatus = document.getElementById('quizStatus');
-            const startQuizButton = document.getElementById('startQuizButton');
-
-            // Cek jika tombol startQuizButton ada (karena bisa dihapus oleh showQuizEnd)
-            if (!startQuizButton || !quizStatus) return;
-
-            const allFilled = allSubmissions.length >= 2; 
-            // PERUBAHAN: Cek berdasarkan userId
-            const userHasFilled = allSubmissions.some(sub => sub.userId === userId);
-
-            if (userHasFilled) {
-                if (allFilled) {
-                    quizStatus.textContent = '✅ Anda sudah siap! Tekan tombol di bawah untuk memulai Tantangan Kejujuran.';
-                    startQuizButton.disabled = false;
-                } else {
-                    quizStatus.textContent = '⏳ Menunggu pengguna lain mengisi pernyataan agar kuis dapat dimulai (minimal 2 pengisi).';
-                    startQuizButton.disabled = true;
-                }
-                startQuizButton.classList.remove('hidden');
-            } else {
-                 quizStatus.textContent = '❌ Anda harus mengisi pernyataan di Langkah 1 terlebih dahulu untuk memulai kuis.';
-                 startQuizButton.classList.add('hidden');
+            if (statementsData && statementsData.length > 0) {
+                renderQuiz(statementsData);
             }
         }
-        
-        // Memastikan listener terpasang saat elemen dibuat
-        document.getElementById('startQuizButton').addEventListener('click', () => {
-             const quizStatus = document.getElementById('quizStatus');
-             const startQuizButton = document.getElementById('startQuizButton');
-             const quizContent = document.getElementById('quizContent');
-             
-             if (quizStatus) quizStatus.classList.add('hidden');
-             if (startQuizButton) startQuizButton.classList.add('hidden');
-             if (quizContent) quizContent.classList.remove('hidden');
-             
-             startQuiz();
-        });
-        
-        function setupQuizProgressMonitoring() {
-            // Data progres kuis disimpan menggunakan Google UID (userId)
-            if (!userId || !db) return;
-            
-            const leaderboardDocRef = doc(db, leaderboardCollectionPath, userId);
-            onSnapshot(leaderboardDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    quizzesTakenIds = new Set(data.quizzesTakenIds || []);
-                    currentScore = data.score || 0;
-                    totalAccumulatedTime = data.totalAccumulatedTime || 0; 
-                    document.getElementById('userScoreDisplay').textContent = currentScore;
-                } else {
-                    quizzesTakenIds = new Set();
-                    currentScore = 0;
-                    totalAccumulatedTime = 0; 
-                    document.getElementById('userScoreDisplay').textContent = 0;
-                }
-                updateQuizProgressDisplay();
-            }, (error) => {
-                console.error("Error listening to leaderboard progress: ", error);
-                showMessage(`Gagal memuat progres kuis (Error: ${error.message}).`, "error");
-            });
-        }
-        
-        function startQuiz() {
-            // PERUBAHAN: Cek userId
-            if (!userId) {
-                showMessage("Pengguna tidak terautentikasi. Harap login ulang.", "error");
-                return;
-            }
 
-            // PERUBAHAN: Filter quizPool berdasarkan userId
-            const quizPool = allSubmissions.filter(sub => {
-                return sub.userId !== userId && !quizzesTakenIds.has(sub.userId);
-            });
-
-            if (quizPool.length === 0) {
-                showQuizEnd();
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * quizPool.length);
-            currentQuizData = quizPool[randomIndex];
+        // --- Step 2: Monitoring (Public Data) ---
+        function setupMonitoring() {
+            if (monitoringUnsubscribe) monitoringUnsubscribe();
             
-            renderQuizQuestion(currentQuizData);
-            startQuestionTimer(); 
-        }
-        
-        function renderQuizQuestion(quizData) {
-            // PERUBAHAN: Tampilkan googleName
-            document.getElementById('quizEmployeeName').textContent = quizData.googleName || 'User Anonim';
-            
-            const optionsContainer = document.getElementById('quizOptionsContainer');
-            const shuffledStatements = [...quizData.statements].sort(() => Math.random() - 0.5);
+            // Dapatkan path koleksi employee_monitoring
+            const monitoringRef = collection(db, employeeCollectionPath);
+            const q = query(monitoringRef);
 
-            optionsContainer.innerHTML = shuffledStatements.map(stmt => `
-                <div class="quiz-option p-4 bg-white border-2 border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-400" 
-                     data-status="${stmt.status}"
-                     onclick="selectAnswer(this)">
-                    ${stmt.text}
-                </div>
-            `).join('');
-            
-            document.getElementById('quizFeedback').classList.add('hidden');
-            document.getElementById('nextQuizButton').classList.add('hidden');
-            const timerDisplay = document.getElementById('questionTimerDisplay');
-            if(timerDisplay) timerDisplay.textContent = '00:00';
-        }
-
-        window.selectAnswer = async function(selectedOption) {
-            stopQuestionTimer(); 
-            
-            document.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.style.pointerEvents = 'none';
-                opt.classList.remove('hover:bg-indigo-50', 'hover:border-indigo-400');
-            });
-
-            const isCorrect = selectedOption.dataset.status === 'Salah';
-            const feedback = document.getElementById('quizFeedback');
-            
-            if (isCorrect) {
-                selectedOption.classList.add('correct-answer');
-                feedback.textContent = 'Jawaban Benar! Anda mendapatkan 10 poin.';
-                feedback.className = 'mt-4 p-3 rounded-lg font-semibold text-center text-green-800 bg-green-100';
-                currentScore += 10;
-            } else {
-                selectedOption.classList.add('incorrect-answer');
-                feedback.textContent = 'Jawaban Salah. Poin Anda tidak bertambah.';
-                feedback.className = 'mt-4 p-3 rounded-lg font-semibold text-center text-red-800 bg-red-100';
+            monitoringUnsubscribe = onSnapshot(q, (snapshot) => {
+                const tableBody = document.getElementById('monitoringTableBody');
+                tableBody.innerHTML = ''; // Kosongkan tabel
                 
-                 document.querySelector('.quiz-option[data-status="Salah"]').classList.add('correct-answer');
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada data pernyataan yang disimpan.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition duration-150';
+
+                    const submissionDate = data.submissionTime?.toDate ? data.submissionTime.toDate().toLocaleString('id-ID') : 'N/A';
+                    const statusText = data.hasSubmitted ? 
+                        `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sudah Isi</span>` :
+                        `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Belum Isi</span>`;
+
+                    row.innerHTML = `
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${data.name || 'N/A'}</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${data.email || 'N/A'}</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-center">${statusText}</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">${submissionDate}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }, (error) => {
+                console.error("Error listening to monitoring data: ", error);
+                document.getElementById('monitoringTableBody').innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat data monitoring.</td></tr>';
+            });
+        }
+        
+        // --- Langkah 3: Tes Kejujuran (Kuis) ---
+        let currentQuiz = [];
+        let userAnswers = {};
+
+        function renderQuiz(statements) {
+            currentQuiz = statements;
+            userAnswers = {};
+            
+            const quizArea = document.getElementById('quizArea');
+            quizArea.innerHTML = '';
+            
+            currentQuiz.forEach((statement, index) => {
+                const quizItem = document.createElement('div');
+                quizItem.className = 'card p-4 border border-gray-200 rounded-xl';
+                quizItem.innerHTML = `
+                    <p class="font-semibold mb-3 text-gray-800">Pernyataan ${index + 1}:</p>
+                    <p class="text-gray-700 mb-4 italic">"${statement.text}"</p>
+                    <div class="flex space-x-4">
+                        <button data-index="${index}" data-answer="true" class="quiz-option flex-1 py-2 rounded-xl border border-green-400 text-green-700 bg-green-50 text-sm font-medium hover:bg-green-100">
+                            Benar (True)
+                        </button>
+                        <button data-index="${index}" data-answer="false" class="quiz-option flex-1 py-2 rounded-xl border border-red-400 text-red-700 bg-red-50 text-sm font-medium hover:bg-red-100">
+                            Salah (False)
+                        </button>
+                    </div>
+                `;
+                quizArea.appendChild(quizItem);
+            });
+
+            document.getElementById('submitQuizButton').classList.remove('hidden');
+            document.getElementById('quizResult').classList.add('hidden');
+            
+            // Tambahkan event listener untuk pilihan kuis
+            quizArea.querySelectorAll('.quiz-option').forEach(button => {
+                button.addEventListener('click', handleQuizAnswer);
+            });
+            
+            updateQuizProgressDisplay();
+        }
+        
+        function handleQuizAnswer(event) {
+            const button = event.target;
+            const index = parseInt(button.dataset.index);
+            const answer = button.dataset.answer === 'true' ? 'Benar' : 'Salah';
+            
+            userAnswers[index] = answer;
+            
+            // Hapus seleksi sebelumnya
+            button.closest('div').querySelectorAll('.quiz-option').forEach(btn => {
+                btn.classList.remove('quiz-selected');
+                btn.classList.remove('bg-indigo-100');
+                btn.classList.add('bg-green-50', 'bg-red-50'); // Reset background for unselected
+            });
+
+            // Tandai seleksi baru
+            button.classList.add('quiz-selected');
+            button.classList.add('bg-indigo-100'); // Uniform color for selection
+            button.classList.remove('bg-green-50', 'bg-red-50');
+            
+            updateQuizProgressDisplay();
+        }
+        
+        function updateQuizProgressDisplay() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalCount = currentQuiz.length;
+            
+            document.getElementById('quizProgressText').textContent = `${answeredCount}/${totalCount}`;
+            const percentage = (answeredCount / totalCount) * 100;
+            document.getElementById('quizProgressBar').style.width = `${percentage}%`;
+            
+            if (answeredCount === totalCount) {
+                document.getElementById('submitQuizButton').disabled = false;
+            } else {
+                document.getElementById('submitQuizButton').disabled = true;
+            }
+        }
+        
+        document.getElementById('submitQuizButton').addEventListener('click', async () => {
+            if (Object.keys(userAnswers).length !== currentQuiz.length) {
+                showMessage("Anda harus menjawab semua pernyataan sebelum mengirim.", 'error');
+                return;
             }
 
-            feedback.classList.remove('hidden');
-            document.getElementById('nextQuizButton').classList.remove('hidden');
-            document.getElementById('userScoreDisplay').textContent = currentScore;
+            // Hitung Skor
+            let correctCount = 0;
+            let totalScore = 0; // Skor dari 100 (10 pertanyaan * 10 poin)
             
-            // PERUBAHAN: Simpan userId
-            quizzesTakenIds.add(currentQuizData.userId);
-            totalAccumulatedTime += currentQuestionTimeElapsed;
-
+            currentQuiz.forEach((statement, index) => {
+                // Jawaban Kuis adalah persepsi pengguna: Apakah pernyataan itu Benar (True) atau Salah (False)
+                const userAnswer = userAnswers[index]; // 'Benar' atau 'Salah'
+                
+                // Status Sebenarnya adalah status yang disubmit pengguna di Langkah 1
+                const actualStatus = statement.status; // 'Benar' atau 'Salah'
+                
+                // Jika persepsi pengguna (userAnswer) SAMA dengan status sebenarnya (actualStatus)
+                // Berarti pengguna berhasil menebak kejujuran orang lain (dalam hal ini, diri sendiri)
+                // Ini dihitung sebagai skor pada kuis (Simulasi: Penilai pihak ketiga)
+                if (userAnswer === actualStatus) {
+                    correctCount++;
+                }
+            });
+            
+            totalScore = (correctCount / currentQuiz.length) * 100; // Normalisasi ke 100
+            
             try {
-                // Menyimpan progres kuis menggunakan Google UID (userId)
+                // 1. Simpan hasil kuis ke database pribadi
+                const quizResultRef = doc(db, `artifacts/${appId}/users/${userId}/quiz_results`, userId);
+                await setDoc(quizResultRef, {
+                    score: totalScore,
+                    correctAnswers: correctCount,
+                    totalQuestions: currentQuiz.length,
+                    quizSubmittedAt: new Date()
+                });
+                
+                // 2. Update Leaderboard (Public)
                 const leaderboardDocRef = doc(db, leaderboardCollectionPath, userId);
-                // PERUBAHAN: Simpan data berdasarkan Google Auth, hapus data pegawai
                 await setDoc(leaderboardDocRef, {
-                    score: currentScore,
-                    quizzesTakenIds: Array.from(quizzesTakenIds),
-                    googleName: auth.currentUser.displayName,
-                    googleEmail: auth.currentUser.email,
-                    totalAccumulatedTime: totalAccumulatedTime, 
+                    userId: userId,
+                    name: auth.currentUser.displayName || 'Pengguna Tanpa Nama',
+                    email: auth.currentUser.email || 'email-tidak-diketahui',
+                    quizScore: totalScore,
                     lastUpdated: new Date()
                 }, { merge: true });
+                
+                // Tampilkan Hasil
+                const resultBox = document.getElementById('quizResult');
+                resultBox.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+                resultBox.classList.add('bg-green-100', 'text-green-800');
+                resultBox.innerHTML = `Selamat! Anda berhasil menyelesaikan kuis. Skor Anda: <strong>${correctCount}/${currentQuiz.length} (${totalScore.toFixed(2)}%)</strong>.`;
+
+                // Nonaktifkan kuis setelah submit
+                document.getElementById('quizArea').querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
+                document.getElementById('submitQuizButton').disabled = true;
+
+                showMessage("Skor kuis berhasil disimpan dan Leaderboard telah diperbarui!", 'success');
             } catch (error) {
-                console.error("Failed to update score:", error);
-                showMessage(`Gagal menyimpan skor Anda (Error: ${error.message}).`, "error");
+                console.error("Error submitting quiz: ", error);
+                showMessage(`Gagal menyimpan hasil kuis: ${error.message}`, 'error');
             }
-             updateQuizProgressDisplay();
-        }
-        
-        document.getElementById('nextQuizButton').addEventListener('click', startQuiz);
-        
-        function showQuizEnd() {
-            stopQuestionTimer(); 
-            const quizArea = document.getElementById('quizArea');
-            
-            quizArea.innerHTML = `
-                <h3 class="text-2xl font-bold text-green-700">Tantangan Selesai!</h3>
-                <p class="mt-2 text-gray-700 text-center">Anda telah menjawab semua pertanyaan yang tersedia. Terima kasih atas partisipasi Anda!</p>
-                <div class="mt-6 bg-white p-4 rounded-lg shadow-md border divide-y">
-                    <div class="py-3">
-                        <p class="text-lg">Skor Akhir Anda:</p>
-                        <p class="text-4xl font-extrabold text-indigo-600">${currentScore} Poin</p>
-                    </div>
-                    <div class="pt-3">
-                        <p class="text-lg">Total Waktu Mengerjakan:</p>
-                        <p class="text-2xl font-bold text-gray-800">${formatTimeReadable(totalAccumulatedTime)}</p>
-                    </div>
-                </div>
-            `;
+        });
+
+        function setupQuizProgressMonitoring() {
+            if (quizUnsubscribe) quizUnsubscribe();
+
+            const quizResultRef = doc(db, `artifacts/${appId}/users/${userId}/quiz_results`, userId);
+
+            quizUnsubscribe = onSnapshot(quizResultRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const correctCount = data.correctAnswers || 0;
+                    const totalCount = data.totalQuestions || 4; 
+                    const totalScore = data.score || 0;
+                    
+                    const resultBox = document.getElementById('quizResult');
+                    resultBox.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+                    resultBox.classList.add('bg-green-100', 'text-green-800');
+                    resultBox.innerHTML = `Hasil Kuis Tersimpan: <strong>${correctCount}/${totalCount} (${totalScore.toFixed(2)}%)</strong>.`;
+
+                    document.getElementById('submitQuizButton').disabled = true;
+                    document.getElementById('submitQuizButton').classList.add('hidden'); // Sembunyikan tombol submit kuis
+
+                    // Kunci UI kuis
+                    document.getElementById('quizArea').querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
+                    
+                } else {
+                    document.getElementById('quizResult').classList.add('hidden');
+                    document.getElementById('submitQuizButton').classList.remove('hidden');
+                    document.getElementById('submitQuizButton').disabled = false;
+                    document.getElementById('quizArea').querySelectorAll('.quiz-option').forEach(btn => btn.disabled = false);
+                }
+            }, (error) => {
+                console.error("Error monitoring quiz progress: ", error);
+            });
         }
 
-        // --- LEADERBOARD (Step 4) ---
+
+        // --- Langkah 4: Leaderboard ---
         function setupLeaderboard() {
-            if (!db) return;
-            const q = query(collection(db, leaderboardCollectionPath));
+            if (leaderboardUnsubscribe) leaderboardUnsubscribe();
             
-            onSnapshot(q, (snapshot) => {
-                const scores = [];
-                snapshot.forEach((doc) => {
-                    // PERUBAHAN: Simpan userId
-                    scores.push({ userId: doc.id, ...doc.data() });
-                });
+            const leaderboardRef = collection(db, leaderboardCollectionPath);
+            // Sorting di-memory karena Firestore orderBy() memerlukan indeks
+            const q = query(leaderboardRef); 
+
+            leaderboardUnsubscribe = onSnapshot(q, (snapshot) => {
+                const tableBody = document.getElementById('leaderboardTableBody');
+                tableBody.innerHTML = '';
                 
-                // Sort by score (desc), then time (asc)
-                const sortedScores = scores.sort((a, b) => {
-                    if (b.score !== a.score) {
-                        return b.score - a.score;
-                    }
-                    return (a.totalAccumulatedTime || 0) - (b.totalAccumulatedTime || 0);
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada skor kuis yang tercatat.</td></tr>';
+                    return;
+                }
+
+                let leaderboardData = [];
+                snapshot.forEach(doc => {
+                    leaderboardData.push(doc.data());
                 });
-                renderLeaderboard(sortedScores);
+
+                // Sortir data di client side (Skor tertinggi ke terendah)
+                leaderboardData.sort((a, b) => (b.quizScore || 0) - (a.quizScore || 0));
+
+                leaderboardData.forEach((data, index) => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition duration-150';
+
+                    const rankClass = index === 0 ? 'bg-yellow-100 text-yellow-800 font-bold' : 
+                                      index === 1 ? 'bg-gray-100 text-gray-800 font-semibold' :
+                                      index === 2 ? 'bg-amber-100 text-amber-800 font-semibold' : '';
+
+                    row.innerHTML = `
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-center ${rankClass}">#${index + 1}</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${data.name || 'N/A'}</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-center">${(data.quizScore || 0).toFixed(2)}%</td>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">${((data.quizScore || 0) * 1.5).toFixed(2)}%</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
             }, (error) => {
-                console.error("Error listening to leaderboard: ", error);
-                showMessage(`Gagal memuat papan skor (Error: ${error.message}).`, "error");
+                console.error("Error listening to leaderboard data: ", error);
+                document.getElementById('leaderboardTableBody').innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat Leaderboard.</td></tr>';
             });
         }
         
-        function renderLeaderboard(scores) {
-            const tableBody = document.getElementById('leaderboardTableBody');
-            if (scores.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada skor yang tercatat.</td></tr>';
+        // --- FITUR BARU: RESET DATA PENGGUNA ---
+        document.getElementById('resetDataButton').addEventListener('click', async () => {
+            if (!userId) {
+                showMessage("Anda harus login Google untuk menghapus data Anda.", 'error');
                 return;
             }
             
-            tableBody.innerHTML = scores.map((entry, index) => {
-                const rankClass = index === 0 ? 'text-amber-500' : (index === 1 ? 'text-slate-500' : (index === 2 ? 'text-orange-700' : 'text-gray-900'));
-                const rankIcon = index === 0 ? '🏆' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : ''));
-                const totalTime = entry.totalAccumulatedTime || 0;
-                
-                // PERUBAHAN: Tampilkan googleName
-                const displayName = entry.googleName || 'User Tanpa Nama';
-                
-                return `
-                     <!-- PERUBAHAN: Sorot baris berdasarkan userId -->
-                     <tr class="hover:bg-gray-50 ${entry.userId === userId ? 'bg-indigo-50 font-bold' : ''}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${rankClass}">${index + 1} ${rankIcon}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${displayName}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-indigo-600">${entry.score}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600">${formatTime(totalTime)}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
+            if (!confirm("APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA PERNYATAAN DAN HASIL KUIS ANDA? Tindakan ini tidak dapat dibatalkan.")) {
+                 return;
+            }
 
-        // --- INITIALIZE ON PAGE LOAD ---
-        window.onload = function() {
-            // Memulai proses autentikasi
-            initializeFirebase();
-        };
+            try {
+                // 1. Hapus dokumen Pernyataan Pribadi
+                const statementDocRef = doc(db, `artifacts/${appId}/users/${userId}/submissions`, userId);
+                await deleteDoc(statementDocRef);
+                
+                // 2. Hapus dokumen Hasil Kuis Pribadi
+                const quizResultDocRef = doc(db, `artifacts/${appId}/users/${userId}/quiz_results`, userId);
+                await deleteDoc(quizResultDocRef);
+
+                // 3. Hapus dokumen dari Leaderboard Publik
+                const leaderboardDocRef = doc(db, leaderboardCollectionPath, userId);
+                await deleteDoc(leaderboardDocRef);
+                
+                // 4. Hapus dokumen dari Monitoring Publik
+                const employeeDocRef = doc(db, employeeCollectionPath, userId);
+                await deleteDoc(employeeDocRef);
+
+
+                // 5. Reset UI ke kondisi awal (setelah login)
+                statementsData = []; // Kosongkan data pernyataan
+                userAnswers = {}; // Kosongkan jawaban kuis
+                resetUIOnLogout(); // Reset semua listener dan tampilan
+                
+                // Aktifkan kembali Langkah 1
+                document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
+                
+                // Inisiasi ulang monitoring dan leaderboard
+                setupMonitoring();
+                setupLeaderboard();
+                
+                showMessage("Data Anda (Pernyataan, Kuis, Leaderboard) berhasil dihapus dan direset. Silakan isi kembali Langkah 1.", 'success');
+                
+            } catch (error) {
+                console.error("Error deleting user data: ", error);
+                showMessage(`Gagal menghapus data: ${error.message}. Coba lagi.`, 'error');
+            }
+        });
+        
+        // Ganti alert() dengan confirm() khusus untuk lingkungan ini
+        function confirm(message) {
+            // Dalam lingkungan ini, kita tidak bisa menggunakan window.confirm
+            // Untuk tujuan pengujian, kita menggunakan simulasi prompt sederhana
+            console.warn("Menggunakan simulasi konfirmasi. Di aplikasi nyata, gunakan modal custom.");
+            return window.prompt(message + " Ketik 'YA' untuk melanjutkan.") === 'YA';
+        }
 
     </script>
 </body>
 </html>
-
-
-
