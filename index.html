@@ -488,12 +488,16 @@
                         
                         showMessage(`Login Berhasil! Selamat datang, ${user.displayName}.`, 'success');
                         
+                        // PERBAIKAN: Langsung aktifkan form input (Langkah 1) setelah login berhasil
+                        document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
+                        
                         // Mulai memuat data setelah login berhasil
                         // DIHAPUS: setupEmployeeDataListener();
                         setupMonitoring();
                         setupLeaderboard();
                         
                         // PERUBAHAN: Langsung cek status submisi user ini
+                        // Fungsi ini sekarang HANYA akan mengisi/menonaktifkan jika data ada
                         checkUserSubmissionStatus();
                         setupQuizProgressMonitoring(); 
 
@@ -659,6 +663,10 @@
                 const docRef = doc(db, submissionCollectionPath, userId);
                 const docSnap = await getDoc(docRef);
 
+                // PERBAIKAN: Hapus 'else' block. Section sudah diaktifkan oleh onAuthStateChanged.
+                // Fungsi ini sekarang hanya bertanggung jawab untuk MENGISI dan MENONAKTIFKAN
+                // jika data SUDAH ADA.
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const textareas = document.querySelectorAll('#step2 textarea');
@@ -676,13 +684,12 @@
                     document.getElementById('submitButton').textContent = 'Data Sudah Tersimpan';
                     showMessage("Anda sudah mengisi pernyataan. Anda dapat memulai kuis.", 'info');
                     
-                    // Aktifkan form input
-                    document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
+                    // PERBAIKAN: Hapus pemanggilan 'classList.remove' dari sini, karena sudah dipindah
                     unlockQuizSection();
-                } else {
-                    // PERUBAHAN: Jika user belum submit, pastikan form-nya aktif
-                    document.getElementById('step2').classList.remove('opacity-50', 'pointer-events-none');
-                }
+                } 
+                // 'else' block (untuk user baru) tidak lagi diperlukan,
+                // karena section sudah diaktifkan dan form-nya kosong/aktif by default.
+
             } catch (error) {
                  console.error("Error checking submission status: ", error);
                  showMessage(`Gagal memeriksa status (Error: ${error.message}).`, "error");
@@ -1012,4 +1019,5 @@
     </script>
 </body>
 </html>
+
 
